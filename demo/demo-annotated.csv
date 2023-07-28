@@ -1,16 +1,34 @@
-Image ID,whale-1,,,,,,,,,,,,,,,,,,,
-Image Path,/Users/.../Demo-image.JPG,,,,,,,,,,,,,,,,,,,
-Focal Length,35,,,,,,,,,,,,,,,,,,,
-Altitude,28.4,,,,,,,,,,,,,,,,,,,
-Pixel Dimension,0.00391667,,,,,,,,,,,,,,,,,,,
-Notes,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,
-Object,Length (m),5.00% Width,10.00% Width,15.00% Width,20.00% Width,25.00% Width,30.00% Width,35.00% Width,40.00% Width,45.00% Width,50.00% Width,55.00% Width,60.00% Width,65.00% Width,70.00% Width,75.00% Width,80.00% Width,85.00% Width,90.00% Width,95.00% Width
-Total_Length,7.593,0.479,0.693,0.869,1.084,1.106,1.172,1.243,1.259,1.184,1.136,1.043,0.929,0.809,0.65,0.504,0.357,0.224,0.169,0.942
-Fluke_span,2.222,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,
-Object,Angle,,,,,,,,,,,,,,,,,,,
-fluke-lead-edge,23.907,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,
-Object,Area (m²),,,,,,,,,,,,,,,,,,,
-diatom-patch-1,0.374,,,,,,,,,,,,,,,,,,,
+Object,Value,Value_unit
+Image ID,0000,Metadata
+Image Path,/Users/clarabird/Box Sync/OSU/CODEX/MMX_v2/demo.png,Metadata
+Focal Length,50.0,Metadata
+Altitude,50.0,Metadata
+Pixel Dimension,0.00391667,Metadata
+Mirror Side,None,Metadata
+Notes,,Metadata
+TL,7.97,Meters
+TL_w10.00,0.60,Meters
+TL_w20.00,1.00,Meters
+TL_w30.00,1.26,Meters
+TL_w40.00,1.27,Meters
+TL_w50.00,1.15,Meters
+TL_w60.00,0.82,Meters
+TL_w70.00,0.60,Meters
+TL_w80.00,0.42,Meters
+TL_w90.00,0.24,Meters
+fluke,1.99,Meters
+fluke_angle,70.505,Degrees
+area,0.026,Square Meters
+TL,2034.0,Pixels
+TL_w10.0,152.3,Pixels
+TL_w20.0,256.2,Pixels
+TL_w30.0,321.9,Pixels
+TL_w40.0,325.4,Pixels
+TL_w50.0,292.7,Pixels
+TL_w60.0,210.3,Pixels
+TL_w70.0,152.3,Pixels
+TL_w80.0,108.1,Pixels
+TL_w90.0,60.0,Pixels
+fluke,509.3,Pixels
+fluke_angle,70.505,Degrees
+area,1684.5,Pixels
