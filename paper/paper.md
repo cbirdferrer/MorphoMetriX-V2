@@ -1,47 +1,60 @@
 ---
-title: 'MorphoMetriX: a photogrammetric measurement GUI for morphometric analysis of megafauna'
-tags:
-  - Python
-  - GUI
-  - Photogrammetry
-  - Morphometry
-  - Drones
-  - Remote sensing
+title: ‘MorphoMetriX version 2: updates to the photogrammetric analysis software’
+tags: 
+–	Python
+–	Photogrammetry
+–	Morphology
+–	Morphometrics 
+–	Drones
+–	Unoccupied aircraft systems
 authors:
-  - name: Walter I. Torres
-    affiliation: 1
-  - name: KC Bierlich
-    affiliation: 1
+–	name: Elliott Chimienti
+corresponding: true
+affiliation: 1
+–	name: Clara N. Bird
+orcid: 0000-0001-7763-7761
+affiliation: 1
+–	name: Walter I. Torres
+affiliation: 2
+–	name: KC Bierlich
+–	orcid: 0000-0001-9724-6055
+affiliation: 1
 affiliations:
- - name: Nicholas School of the Environment, Duke University Marine Laboratory
-   index: 1
-date: 27 August 2019
+–	name: Center of Drone Excellence (CODEX), Marine Mammal Institute, Oregon State University, Newport, Oregon, USA
+index: 1
+–	name: Applied Physics Laboratory, University of Washington, Seattle, Washington, USA
+index: 2
+
+date: 27 July 2023
 bibliography: paper.bib
 ---
 
 # Summary
 
-Body size is recognized as one of the most important factors that determine animal function and performance in its environment [@SchmidtNielsen:1984] and well-sampled and accurate size measurements of wild animals can indicate population health [@Altmann:1993; @Hilderbrand:1999; @French:2011]. However, estimating the body size of large wild vertebrates, like many cetaceans (whales, dolphins, and porpoises) is particularly challenging, as their mobility and large size impedes in situ measurements or live capture [@Huang:2009; @Goldbogen:2015]. Historically, lethal sampling, either scientifically or opportunistically from commercial whaling, has provided measurements of large whales in the past [@Mackintosh:1929; @Lockyer:1985; @Ichii:1991; @Christiansen:2014], but these methods are often not permissible today, expensive, and/or are considered unethical and biased [@Baker:2000; @Clapham:2003; @Clapham:2018]. Alternatively, aerial photogrammetry has proven to be a reliable non-invasive method for obtaining measurements of many megavertebrates, such as cetaceans [@Perryman:2002; @Miller:2012], and the recent advancement of unoccupied aircraft systems (UAS, or drones) has enabled a more affordable, efficient, and accessible means of acquiring high-resolution aerial imagery for morphometric analysis [@Durban:2015; @Christiansen:2018; @Johnston:2019]. With increased opportunity to collect aerial imagery of inaccessible wildlife via UAS, an efficient and simple to use tool for accurate morphometric measurements is needed. 
+Over the past decade, unoccupied aircraft systems (UAS, or “drones”) have increasingly become prevalent in wildlife sciences for collecting high resolution aerial imagery. In particular, drones provide a more efficient method for non-invasively obtaining morphometric measurements of megafauna. MorphoMetriX is an open-source photogrammetry software developed as a user-friendly graphical user interface (GUI) for customized measurements, including lengths, segmented widths, angles, and areas [@Torres:2020]. Since its release, MorphoMetriX has been used in a variety of drone-based aerial photogrammetry studies on megafauna populations, particularly cetaceans and other marine mammals, related to body length, body condition, morphological relationships, biomechanics and maneuverability, and even detecting pregnancy [@Kahane-Rapport:2020; @Bierlich:2021b; @Bierlich:2021a; @Bierlich:2022; @Stepanuk:2021; @Cheney:2022; @Gough:2022; @Hirtle:2022; @Pallin:2022; @Segre:2022; @Torres:2022; @Cade:2023; @Fernandez Ajo:2023]. Furthermore, the development of MorphoMetriX led to the creation of CollatriX, a software designed to be paired with MorphoMetriX to make processing measurement data easier [@Bird:2020]. CollatriX collates MorphoMetriX outputs into a single data frame and contains functions for calculating a variety of cetacean body condition metrics.
 
-``MorphoMetriX`` is a flexible photogrammetry graphical user interface (GUI) developed in PyQt5 for making efficient manual morphometric measurements of wild animals via aerial imagery. It was originally designed for the purpose of obtaining morphometric measurements of large whales imaged via UAS, but can be applied to other animals (e.g., pinnipeds, alligators, manatees) and used with nadir imagery collected via other platforms. 
+As drones continue to be utilized by wildlife scientists to collect high resolution imagery of megafauna, maintaining accessible and flexible photogrammetry software to stay current with the needs of analysts will help facilitate efficient and robust morphometric analyses to answer novel questions and better monitor populations. Here we present MorphoMetriX version 2 (v2), with new features to significantly improve and enhance usability of the program, measurement efficiency, and data outputs. 
 
-``MorphoMetriX`` was inspired by the image processing program ImageJ [@Schneider:2012] and other UAS photogrammetry tools written in R [@Christiansen:2016] and MATLAB [@Dawson:2017; @Burnett:2018] that were developed specifically for measuring body condition of cetaceans. While ImageJ is an open source software with a powerful zoom function and the freedom and flexibility to measure any object of interest in an image, it lacks the ability to automatically section animals proportionally for perpendicular width measurements (i.e., body width measurements at 10% intervals along the total length of an animal), a key method used for comparative studies of body condition in cetaceans [@Miller:2012; @Christiansen:2016; @Dawson:2017; @Christiansen:2018].
+# Statement of need 
 
-Several software systems, written in MATLAB and R, have been developed to extract photogrammetric measures from aerial images of megavertebrates. However, some of these tools have slow workflows, are designed with only particular aircraft/sensor combinations and/or specific measurements in mind e.g., [@Dawson:2017; @Burnett:2018], have limited image zoom capabilities e.g., [@Christiansen:2016; @Dawson:2017; @Burnett:2018], and in some cases are not open source, requiring purchased or institutional licensing e.g., [@Dawson:2017; @Burnett:2018]. These existing tools written in R and MATLAB are relatively feature-rich, allowing the measurement of proportional body widths based on total length, as well as a set of additional pre-fixed morphometric measurement options, such as ‘width of eyes’, ‘rostrum to blowhole’, and ‘fluke width’.  However, these predetermined measurements are the only ones supported by the software system and can be altered and/or adapted only if the user has knowledge of the specific coding language, in these cases MATLAB or R.
+MorphoMetriX was designed to overcome limitations of other available photogrammetry software by providing a fast and easy to use GUI with a powerful zoom function to improve accuracy in measurements and the flexibility to make customized length, width, area, and angle measurements with no required knowledge of any scripting language [@Torres:2020]. As MorphoMetriX has continuously been used in various morphometric studies of megafauna, we have incorporated user feedback to ultimately enhance and develop v2 for improved, efficient, and robust measuring. 
 
-MorphoMetriX is an open-source application that overcomes some of the limitations of these existing tools, combining the powerful zoom, accuracy, and measurement freedom of ImageJ, the accessibility of a GUI designed to measure body widths based on body length, and the speed of the PyQt5 codebase. It was designed as a simple to use and accurate program for robust morphometric analysis that does not require knowledge of any scripting language for customization. MorphoMetriX allows the user to input flight and sensor parameters, such as altitude, focal length, and pixel dimensions (calculated by dividing the sensor width of the camera by the image width in pixels), so that all measurements in pixels are automatically scaled to real world values (i.e., meters) (Fig. 1-3). The user imports an image of an animal and can create custom length measurements, such as “total length”, “fluke span”, “fluke chord width”, “pectoral fin width”, “scar”, etc (Fig. 2). The user can measure perpendicular widths based on a length measurement (the user can specify the number of width segments, Fig. 2 & 3). Additionally, the user has the option to “Measure Area” , where they can create custom area measurements such as “diatom patch” or “fluke area”, and to “Measure Angle” where the user can create a custom angle measurement, such as “Sweep Angle” (Fig. 2). Once completed, all measurements and their labels are exported into a .csv, along with an image of all the measurements that were made on the animal. 
+# Description of updates
 
-``MorphoMetriX`` has already been used on several projects with a variety of cetacean species, including bottlenose dolphins, blue, humpback, fin, Antarctic minke, dwarf minke, pilot, and beaked whales. It is also ideal for training and teaching in the classroom for lessons and labs in photogrammetry and morphometrics.
+MorphoMetriX v2 can now be downloaded as executable (.exe) and Disk iMaGe (.dmg) files for Windows and MacOS, respectively. The MacOS version is functional for both M1/M2 and Intel chip processors. A link to the detailed manual of MorphoMetriX v2 is also embedded into the GUI and can also be accessed on GitHub (https://github.com/ZappyMan/morphometrix). 
+
+We have improved existing and added several new functions to MorphoMetriX v2 (Figure 1). The ‘Measure Widths’ function automatically divides a length measurement into perpendicular widths based on the designated number of width segments specified by the user (Figure 1, Figure 2). MorphoMetriX v2 now automatically places slidable width points on each perpendicular width line, enabling the user to easily adjust and edit width measurements until satisfied with each placement, whereas in v1 users had to manually click each width point with minimal editing ability. The color and size of the width points can now be customized to help create contrast with the image and ensure the points do not obscure the view of the animal (Figure 2). ‘Mirror Side’ is a new feature that allows users to calculate the body widths of an animal using the edge of the width of one side (A or B) to the center line (Figure 2). This is particularly useful if one of the sides is obstructed, i.e., from glare, refraction, shadows, and greatly increases the number of measurable images available for analysis. The width measurement assumes symmetry between both sides (A and B) and multiplies the selected side by two to get the full width measurement (i.e., width = side A point to center line * 2). The default is “None”, which measures the distance between the edge of the whale from Side A to Side B. The option chosen by the user is reported in the outputted csv. 
+
+MorphoMetriX v2 measurement outputs are now exported in both meters and in pixels and saved in long format csv, for a more interpretable output file that can easily be linked with additional metadata. Finally, if MorphoMetriX v2 crashes, a crash report is automatically generated and saved so that it can be uploaded as an “Issue” report on GitHub to help communicate issues and further improve the program. Ultimately, these changes greatly improve the user experience of MorphoMetriX, increase the available sample size, and improve the error reporting functionality, making this update a valuable and significant change.
+
 
 # Figures
-![Photogrammetric basics of how each UAS image is scaled to convert measurements in pixels to real world values (i.e., meters). Altitude is the distance between the camera lens and the animal/object of interest. Pixel dimensions is determined by dividing the sensor width of the camera (mm) by the image width (pixels). MorphoMetriX uses the altitude, focal length of camera (mm), and pixel dimensions to calculate the ground sampling distance (GSD), the distance each pixel represents on the ground. MorphoMetriX then multiplies the GSD by lengths measured in pixels by the user to scale to real world values (m).](../images/figure1.png)
+![Figure 1. MorphoMetriX v2 with description of functions and inputs in the dialog panel](../images/figure1.png)
 
-![Image of Antarctic minke whale imported into MorphoMetriX. Measurements of total length and width (in 5% increments of total length in this case), as well as the area of a diatom patch (shaded polygon). Highlighted width lines guide the user to select a point along the width line, in this case the edge of the whale. A red dot marks the selected point and the next width line is highlighted. If the user accidentally selects a point adjacent to the highlighted line, the red dot will snap to the closest point on the highlighted line and record that point.](../images/figure2.png)
-
-![Zoomed in view of the dialog box in MorphoMetriX for the user to enter details about the UAS flight altitude, camera specifications, the number of width segments desired (20 in this case), and any notes. See Figures 1 and 2 for example of inputs.](../images/figure3.png)
+![Figure 2. Examples of the enhanced “Measure Widths” function, commonly used to measure body condition of megafauna. A) A total body length measurement is automatically divided into perpendicular widths based on the “# Width Segments” designated by the user (here 20 width segments, or 5% increments of the total body length measurement). Slidable width points are then automatically placed on each perpendicular width. B) The user can then slide and adjust each slidable width point to the desired location, in this example to the edge of the whale’s body on both sides. Here, “Mirror Side” is designated as “None” indicating that each perpendicular width is measured as the distance between side A and B. C) In some cases, one side of the whale’s body may be obstructed, i.e., from glare, refraction, shadows, etc., while the other side is clear and easy to identify. In these circumstances, the user can use “Mirror Side” to select the labeled side of the whale that is clearer to identify (in this example Side A). The total body length measurement is assumed to bisect the animal symmetrically, and so the perpendicular width is then measured as the distance from the width point on the specified side to the intersection of the total body length measurement and multiplied by two.](../images/figure2.png)
 
 # Acknowledgements
 
-We acknowledge Dr. David Johnston for project feedback and recommendations, Clara Bird for application development support, the students in the "Drones in Marine Biology, Ecology, and Conservation" Duke University summer course for beta testing, the Pivers Island Data Club for user feedback, as well as Michelle Pan and Nick Xu for UX suggestions. This work was supported by the Duke University Marine Laboratory.
+This work was supported by the Marine Mammal Institute at Oregon State University, the Oregon Gray Whale License Plate Fund, and the Office of Naval Research. Special thanks to all the users and beta testers of MorphoMetriX over the years who have provided positive feedback to help us further improve and develop the program. We also would like thank Dr. Leigh Torres and Dr. David Johnston for project support. 
 
 # References
