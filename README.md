@@ -16,7 +16,7 @@ Once downloaded, just double click on the installed file to run. For step-by-ste
 
 ## Demo
 
-For a demonstration of ``MorphoMetriX`` used to measure a gray whale, please refer to the [demo]( <https://github.com/wingtorres/morphometrix/blob/master/demo>) directory. 
+For a demonstration of ``MorphoMetriX`` used to measure a gray whale, please refer to the [demo]( <https://github.com/ZappyMan/MorphoMetriX/blob/master/demo>) directory. 
 
 # Attribution
 
@@ -32,7 +32,7 @@ See [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md)
 
 Copyright (C) 2023 Elliott Chimienti, Clara Bird, Walter Torres, KC Bierlich
 
-``MorphoMetriX`` is free software made available under the MIT License. For details see the the [LICENSE]( <https://github.com/wingtorres/morphometrix/blob/master/LICENSE>) file.
+``MorphoMetriX`` is free software made available under the MIT License. For details see the the [LICENSE]( <https://github.com/ZappyMan/MorphoMetriX/blob/master/LICENSE>) file.
 
 # Contributors
 
