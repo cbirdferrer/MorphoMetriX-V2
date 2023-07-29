@@ -32,7 +32,7 @@ See [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md)
 
 Copyright (C) 2023 Elliott Chimienti, Clara Bird, Walter Torres, KC Bierlich
 
-``MorphoMetriX`` is free software made available under the MIT License. For details see the the [LICENSE]( <https://github.com/ZappyMan/MorphoMetriX/blob/master/LICENSE>) file.
+``MorphoMetriX`` is free software made available under the MIT License. For details see the the [LICENSE]( <https://github.com/ZappyMan/MorphoMetriX/blob/master/LICENSE.md>) file.
 
 # Contributors
 
