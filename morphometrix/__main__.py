@@ -413,19 +413,22 @@ class MainWindow(QMainWindow):
                     self.iw.scene.removeItem(ellipse_label)
             elif item == "l":                           # Not working (type error)
                 self.lengthNames.pop()
-                line = self.iw.lines.pop()
-                print(line)
-            elif item == "ar":                           # Not Working
+                lines = self.iw.linear.pop()
+                for line in lines:
+                    self.iw.scene.removeItem(line)
+                #print("LINE: ",line)
+                #print("HERE: ",self.iw.scene.items())
+            elif item == "ar":                           # Working
                 self.areaNames.pop()
-                if self.iw.areaValues:
-                    area = self.iw.areas.pop()
-                    print("AREA: ", area)
-                    self.iw.scene.removeItem(area)  
+                lines = self.iw.areas.pop()
+                for line in lines:
+                    self.iw.scene.removeItem(line)
+                poly = self.iw.areas.pop()   
+                self.iw.scene.removeItem(poly)
             elif item == "an":                          # Not working (exmpty list)
                 self.angleNames.pop()
-                if self.iw.angleValues:
-                    self.iw.scene.removeItem(self.iw.angles.pop())
-                    self.iw.scene.removeItem(self.iw.angles.pop())
+                for line in self.iw.angles.pop():
+                    self.iw.scene.removeItem(line)
             if len(self.creation_record) <= 0:
                 self.undoButton.setEnabled(False)
         
@@ -554,6 +557,7 @@ class imwin(QGraphicsView):  #Subclass QLabel for interaction w/ QPixmap
         self.ellipseLines = []
         self.elliseLabels = []
         self.lines = []
+        self.linear = []
         self.areas = []
         self.angles = []
         #self.d = {}  #dictionary for line items
@@ -657,16 +661,6 @@ class imwin(QGraphicsView):  #Subclass QLabel for interaction w/ QPixmap
                     self.scene.removeItem(self.scene.polyItem)
                     self.scene.polyItem = False
                 if intersect:
-                    #indicate intersect point
-                    p = QtCore.QPointF(xi, yi)
-                    self.scene.area_ellipseItem = QGraphicsEllipseItem(0, 0, 10, 10)
-                    self.scene.area_ellipseItem.setPos(p.x() - 10 / 2, p.y() - 10 / 2)
-                    self.scene.area_ellipseItem.setBrush(
-                    QtGui.QBrush(QtGui.QColor('blue'))) #, style=QtCore.Qt.BrushStyle.SolidPattern))
-                    self.scene.area_ellipseItem.setFlag(
-                    QGraphicsItem.GraphicsItemFlag.ItemIgnoresTransformations,
-                    False)  #size stays small, but doesnt translate if set to false
-                    self.scene.addItem(self.scene.area_ellipseItem)
                     
                     #shade polygon region
                     points = [ QtCore.QPointF(x,y) for x,y in zip( self.A.x[k:], self.A.y[k:] ) ]
@@ -706,7 +700,8 @@ class imwin(QGraphicsView):  #Subclass QLabel for interaction w/ QPixmap
                 self.lengths[-1] = self.l
 
                 self.xs, self.ys = B[:,0], B[:,1]
-
+                
+                undolines = []
                 #draw cubic line to interpolated points
                 for i in range(1, nt - 1):
                     P0 = QtCore.QPointF( self.xs[i-1], self.ys[i-1] )#.toPoint()
@@ -715,8 +710,8 @@ class imwin(QGraphicsView):  #Subclass QLabel for interaction w/ QPixmap
 
                     path = QtGui.QPainterPath(P0)
                     path.cubicTo(P0, P1, P2)
-                    self.scene.addPath(path)
-                    self.lines.append(path)
+                    undolines.append(self.scene.addPath(path))
+                self.linear.append(undolines)
 
             self.lengths.extend([np.nan])
 
@@ -734,7 +729,6 @@ class imwin(QGraphicsView):  #Subclass QLabel for interaction w/ QPixmap
     def polyClose(self): #make into hot key not button
         if self.measuring_area:
             if self.line_count > 2: #cant make polygon w/ two lines
-                print("POLYCLOSE")
                 self.measuring_area = False
                 A = self.A.calcArea()
                 self.areaValues = np.append(self.areaValues, A) #add area values
@@ -870,6 +864,10 @@ class imwin(QGraphicsView):  #Subclass QLabel for interaction w/ QPixmap
             start = self._thispos
             end = QtCore.QPointF(data)
 
+            self.scene.realline = QGraphicsLineItem(QtCore.QLineF(start, end))
+            self.scene.addItem(self.scene.realline)
+            self.lines.append(self.scene.realline)
+
             if self._lastpos and self.measuring_angle:
 
                 a = self._lastpos - self._thispos
@@ -885,10 +883,9 @@ class imwin(QGraphicsView):  #Subclass QLabel for interaction w/ QPixmap
                 QApplication.setOverrideCursor(QtCore.Qt.CursorShape.ArrowCursor)  #change cursor
                 self.parent().angleButton.setChecked(False)
                 self.parent().bezier.setEnabled(True)
-
-            self.scene.realline = QGraphicsLineItem(QtCore.QLineF(start, end))
-            self.scene.addItem(self.scene.realline)
-            self.angles.append(self.scene.realline)
+                self.lines.append(self.scene.testline)
+                self.angles.append(self.lines)
+                self.lines = []                     # Clear array for undo
 
         #Collect piecewise line start/end points
         self._lastpos = self._thispos  # save old position value
@@ -918,6 +915,10 @@ class imwin(QGraphicsView):  #Subclass QLabel for interaction w/ QPixmap
                 self.scene.polyItem = False #remove mouseover polygon
                 self.scene.addItem(self.scene.polyItem2) #shade in polygon
                 self.areas.append(self.scene.polyItem2)
+                print("LINES: ", self.lines)
+                self.lines.append(self.scene.testline)
+                self.areas.append(self.lines)
+                self.lines = []                 # Clear array for undo
                 self.parent().statusbar.showMessage('Polygon area measurement completed')
                 self.parent().areaButton.setChecked(False)
                 self.parent().bezier.setEnabled(True) #make bezier fit available again
