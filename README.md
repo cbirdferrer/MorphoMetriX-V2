@@ -8,7 +8,7 @@ Also check out [CollatriX](https://github.com/cbirdferrer/collatrix)<sup>1</sup>
 
 ## Installation 
 
-To install MorphoMetrix go to our [release page](https://github.com/ZappyMan/morphometrix/releases) and download either the dmg (for macs) or exe (for windows). For further detail, please see our manual pdf.
+To install MorphoMetrix go to our [release page](https://github.com/ZappyMan/morphometrix/releases) and download either the dmg (for macs) or exe (for windows). For further detail, please see our [manual pdf](https://github.com/ZappyMan/MorphoMetriX/blob/master/MorphoMetriX_v2_manual.pdf).
     
 ## Running MorphoMetriX
 
