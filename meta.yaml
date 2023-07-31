@@ -20,7 +20,8 @@ requirements:
   run:
     - python >=3.6
     - numpy
-    - pyqt >=5.9.2
+    - pyside6 >=6.5.0
+    - scipy >= 1.9.1
     
 about:
   home: https://github.com/wingtorres/morphometrix/
