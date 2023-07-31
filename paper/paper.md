@@ -55,6 +55,6 @@ MorphoMetriX v2 measurement outputs are now exported in both meters and in pixel
 
 # Acknowledgements
 
-This work was supported by the Marine Mammal Institute at Oregon State University, the Oregon Gray Whale License Plate Fund, and the Office of Naval Research. Special thanks to all the users and beta testers of MorphoMetriX over the years who have provided positive feedback to help us further improve and develop the program. We also would like thank Dr. Leigh Torres and Dr. David Johnston for project support. 
+This work was supported by the Marine Mammal Institute at Oregon State University, the Oregon Gray Whale License Plate Fund, and the Office of Naval Research. Special thanks to all the users and beta testers of MorphoMetriX over the years who have provided positive feedback to help us further improve and develop the program. We also would like thank Dr. Leigh Torres and Dr. David Johnston for project support. Lastly, we would like to acknowledge and express our gratitude to Suzie Winquist for her creative and skillful design of the MorphoMetriX application logo.
 
 # References
