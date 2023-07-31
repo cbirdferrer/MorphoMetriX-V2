@@ -110,7 +110,7 @@ class Window(QWidget):
         self.button_color.clicked.connect(self.color_changed)
 
         self.manual = QPushButton("Manual", self)
-        self.manual.clicked.connect(lambda: webbrowser.open('https://github.com/wingtorres/morphometrix'))
+        self.manual.clicked.connect(lambda: webbrowser.open('https://github.com/ZappyMan/MorphoMetriX/blob/master/MorphoMetriX_v2_manual.pdf'))
 
         self.exit = QPushButton("Exit", self)
         self.exit.clicked.connect(self.close_application)
