@@ -69,7 +69,7 @@ class Window(QWidget):
         #init methods runs every time, use for core app stuff)
         super(Window, self).__init__()
 
-        self.setWindowIcon(QIcon("icon.PNG"))
+        self.setWindowIcon(QIcon(resource_path("icon.PNG")))
         self.setWindowTitle("MorphoMetriX")
         self.iw = iw    # Reference for color picker
 
@@ -166,7 +166,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self, parent = None):
         super(MainWindow, self).__init__()
-        self.setWindowIcon(QIcon("icon.PNG"))
+        self.setWindowIcon(QIcon(resource_path("icon.PNG")))
         self.setWindowTitle("MorphoMetriX")
         D = self.screen().availableGeometry()
         self.move(0,0)#center.x() + .25*D.width() , center.y() - .5*D.height() )

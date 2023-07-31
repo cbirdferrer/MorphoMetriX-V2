@@ -6,7 +6,7 @@ a = Analysis(
     ['__main__.py'],
     pathex=[],
     binaries=[],
-    datas=[('crosshair.png', 'icon.png', '.')],
+    datas=[('crosshair.png', '.'),('icon.png', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -24,7 +24,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='Morphometrix',
+    name='MorphoMetriX',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -44,11 +44,11 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='Morphometrix',
+    name='MorphoMetriX',
 )
 app = BUNDLE(
     coll,
-    name='Morphometrix.app',
+    name='MorphoMetriX.app',
     icon='logo.icns',
     bundle_identifier=None,
 )
