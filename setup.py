@@ -7,7 +7,7 @@ setup(
     author = "Walter Torres",
     author_email = "walter.torres@duke.edu",
     license='MIT',
-    url = "https://github.com/wingtorres/morphometrix/",
+    url = "https://github.com/ZappyMan/MorphoMetriX",
     entry_points={
         'gui_scripts': [
             'morphometrix = morphometrix.__main__:main'
