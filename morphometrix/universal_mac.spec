@@ -6,7 +6,7 @@ a = Analysis(
     ['__main__.py'],
     pathex=[],
     binaries=[],
-    datas=[('crosshair.png', '.')],
+    datas=[('crosshair.png', 'icon.png', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

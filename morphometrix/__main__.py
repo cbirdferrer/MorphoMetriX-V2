@@ -14,7 +14,7 @@ from scipy.optimize import root_scalar
 
 from PySide6 import QtGui, QtCore
 from PySide6.QtWidgets import QSlider ,QColorDialog ,QGraphicsTextItem ,QComboBox, QMainWindow, QApplication, QGraphicsView, QGraphicsScene, QWidget, QToolBar, QPushButton, QLabel, QLineEdit, QPlainTextEdit, QGridLayout, QFileDialog, QGraphicsLineItem, QGraphicsPixmapItem,QGraphicsEllipseItem, QGraphicsPolygonItem, QGraphicsItem, QMessageBox, QInputDialog, QDockWidget, QSizePolicy, QRadioButton
-from PySide6.QtGui import QShortcut, QFont, QPixmap
+from PySide6.QtGui import QShortcut, QFont, QPixmap, QIcon
 from PySide6.QtCore import Qt
 
 # ------------------------------
@@ -68,6 +68,9 @@ class Window(QWidget):
     def __init__(self, iw):
         #init methods runs every time, use for core app stuff)
         super(Window, self).__init__()
+
+        self.setWindowIcon(QIcon("icon.PNG"))
+        self.setWindowTitle("MorphoMetriX")
         self.iw = iw    # Reference for color picker
 
         self.label_id = QLabel("Image ID")
@@ -163,7 +166,8 @@ class MainWindow(QMainWindow):
 
     def __init__(self, parent = None):
         super(MainWindow, self).__init__()
-
+        self.setWindowIcon(QIcon("icon.PNG"))
+        self.setWindowTitle("MorphoMetriX")
         D = self.screen().availableGeometry()
         self.move(0,0)#center.x() + .25*D.width() , center.y() - .5*D.height() )
         self.resize( int(.95*D.width()), int(6*D.height()) )
