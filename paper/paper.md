@@ -1,30 +1,13 @@
---- 
-title: ‘MorphoMetriX version 2, updates to the photogrammetric analysis software’
-tags:
-–	Python
-–	Photogrammetry
-–	Morphology
-–	Morphometrics 
-–	Drones
-–	Unoccupied aircraft systems
-authors:
-–	name: Elliott Chimienti
+---
+title: "MorphoMetriX version 2: updates to the photogrammetric analysis software"
+tags: Python, Photogrammetry, Morphology, Morphometrics, Drones, Unoccupied
+  aircraft systems
+authors: null
+–	author1: Elliott Chimienti
 corresponding: true
 affiliation: 1
-–	name: Clara N. Bird
+–	author2: Clara N. Bird
 orcid: 0000-0001-7763-7761
-affiliation: 1
-–	name: Walter I. Torres
-affiliation: 2
-–	name: KC Bierlich
-–	orcid: 0000-0001-9724-6055
-affiliation: 1
-affiliations:
-–	name: Center of Drone Excellence (CODEX), Marine Mammal Institute, Oregon State University, Newport, Oregon, USA
-index: 1
-–	name: Applied Physics Laboratory, University of Washington, Seattle, Washington, USA
-index: 2
-
 date: 27 July 2023
 bibliography: paper.bib
 ---
