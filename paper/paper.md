@@ -1,5 +1,6 @@
 ---
 title: 'MorphoMetriX version 2: updates to the photogrammetric analysis software'
+
 tags:
   - Python
   - Photogrammetry
@@ -7,6 +8,7 @@ tags:
   - Morphometrics
   - Drones
   - Unoccupied aircraft systems
+
 authors:
   - name: Elliott Chimienti
     affiliation: 1
@@ -19,6 +21,7 @@ authors:
   - name: KC Bierlich
     affiliation: 1
     orcid: 0000-0001-9724-6055
+
 affiliations:
  - name: Center of Drone Excellence (CODEX), Marine Mammal Institute, Oregon State University, Newport, Oregon, USA
    index: 1
