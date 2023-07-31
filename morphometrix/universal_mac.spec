@@ -49,6 +49,6 @@ coll = COLLECT(
 app = BUNDLE(
     coll,
     name='Morphometrix.app',
-    icon=None,
+    icon='logo.icns',
     bundle_identifier=None,
 )
