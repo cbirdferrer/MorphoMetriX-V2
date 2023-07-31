@@ -1,23 +1,32 @@
 --- 
-title: ‘MorphoMetriX version 2, updates to the photogrammetric analysis software’
-tags: Python, Photogrammetry, Morphology, Morphometrics, Drones, Unoccupied
+title: 'MorphoMetriX version 2: updates to the photogrammetric analysis software'
+
+tags: 
+  - Python
+  - Photogrammetry
+  - Morphology
+  - Morphometrics
+  - Drones
+  - Unoccupied
+
 authors:
-–	name: Elliott Chimienti
+- name: Elliott Chimienti
   corresponding: true
   orcid: 0009-0002-7047-7632
   affiliation: 1
-–	name: Clara N. Bird
+- name: Clara N. Bird
   orcid: 0000-0001-7763-7761
   affiliation: 1
-–	name: Walter I. Torres
+- name: Walter I. Torres
   affiliation: 2
-–	name: KC Bierlich
+- name: KC Bierlich
   orcid: 0000-0001-9724-6055
   affiliation: 1
+
 affiliations:
-–	name: Center of Drone Excellence (CODEX), Marine Mammal Institute, Oregon State University, Newport, Oregon, USA
+- name: Center of Drone Excellence (CODEX), Marine Mammal Institute, Oregon State University, Newport, Oregon, USA
   index: 1
-–	name: Applied Physics Laboratory, University of Washington, Seattle, Washington, USA
+- name: Applied Physics Laboratory, University of Washington, Seattle, Washington, USA
   index: 2
 
 date: 27 July 2023
@@ -50,5 +59,3 @@ MorphoMetriX v2 measurement outputs are now exported in both meters and in pixel
 # Acknowledgements
 
 This work was supported by the Marine Mammal Institute at Oregon State University, the Oregon Gray Whale License Plate Fund, and the Office of Naval Research. Special thanks to all the users and beta testers of MorphoMetriX over the years who have provided positive feedback to help us further improve and develop the program. We also would like thank Dr. Leigh Torres and Dr. David Johnston for project support. Lastly, we would like to acknowledge and express our gratitude to Suzie Winquist for her creative and skillful design of the MorphoMetriX application logo.
-
-# References
