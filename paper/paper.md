@@ -1,6 +1,6 @@
 ---
 title: ‘MorphoMetriX version 2: updates to the photogrammetric analysis software’
-tags: 
+tags:
 –	Python
 –	Photogrammetry
 –	Morphology
