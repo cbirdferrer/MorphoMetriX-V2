@@ -29,7 +29,7 @@ affiliations:
    index: 2
 
 date: 27 July 2023
-bibliography: paper.bib
+bibliography: paper/paper.bib
 
 # Summary
 
