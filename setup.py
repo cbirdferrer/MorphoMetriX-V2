@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "morphometrix",
-    version = "1.0.2",
+    version = "2.0.0",
     description="A GUI for photogrammetry",
     author = "Walter Torres",
     author_email = "walter.torres@duke.edu",

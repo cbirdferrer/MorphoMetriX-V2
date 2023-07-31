@@ -207,7 +207,6 @@ class MainWindow(QMainWindow):
         self.widthsButton = QPushButton("Measure Widths", self)
         self.widthsButton.clicked.connect(self.measure_widths)
         self.widthsButton.setEnabled(False)
-        self.widthsButton.setCheckable(True)
         self.widthNames = []
 
         self.areaButton = QPushButton("Measure Area", self)
@@ -294,6 +293,7 @@ class MainWindow(QMainWindow):
 
         self.iw.widths = []         # Stores calculated width lengths on export
         self.iw.lengths = [[]]      # Stores length objects
+        self.iw.ellipses = []
         self.iw.L = posData(
             np.empty(shape=(0, 0)), np.empty(shape=(0, 0)))  #lengths
         self.iw.A = posData(
@@ -331,10 +331,12 @@ class MainWindow(QMainWindow):
         if ok:
             self.lel.setText(str(text))
             self.lengthNames.append(self.lel.text())
-            self.creation_record.append("l")
+            if self.bezier.isChecked():
+                self.creation_record.append("l")
+            else:
+                self.creation_record.append("pl")
             self.undoButton.setEnabled(True)
             QApplication.setOverrideCursor(QtCore.Qt.CursorShape.CrossCursor)  #change cursor
-            self.widthsButton.setChecked(False)
             self.widthsButton.setEnabled(False)
             self.iw.line_count = 0
             self.iw.measuring_length = True
@@ -403,7 +405,7 @@ class MainWindow(QMainWindow):
     def undo(self):
         if len(self.creation_record) > 0:
             item = self.creation_record.pop()
-            if item == "w":                             # Working
+            if item == "w":  # Undo Width
                 self.widthNames.pop()
                 for ellipse in self.iw.ellipses.pop():  # Remove ellipses
                     self.iw.scene.removeItem(ellipse)
@@ -411,26 +413,34 @@ class MainWindow(QMainWindow):
                     self.iw.scene.removeItem(ellipse_line)
                 for ellipse_label in self.iw.elliseLabels.pop():
                     self.iw.scene.removeItem(ellipse_label)
-            elif item == "l":                           # Not working (type error)
+            elif item == "l":  # Undo Length
                 self.lengthNames.pop()
                 lines = self.iw.linear.pop()
                 for line in lines:
                     self.iw.scene.removeItem(line)
-                #print("LINE: ",line)
-                #print("HERE: ",self.iw.scene.items())
-            elif item == "ar":                           # Working
+            elif item == "pl":   # Undo piecewise length
+                self.lengthNames.pop()
+                lines = self.iw.linear.pop()
+                for line in lines:
+                    self.iw.scene.removeItem(line)
+            elif item == "ar":  # Undo Area
                 self.areaNames.pop()
                 lines = self.iw.areas.pop()
                 for line in lines:
                     self.iw.scene.removeItem(line)
                 poly = self.iw.areas.pop()   
                 self.iw.scene.removeItem(poly)
-            elif item == "an":                          # Not working (exmpty list)
+            elif item == "an": # Undo Angle
                 self.angleNames.pop()
                 for line in self.iw.angles.pop():
                     self.iw.scene.removeItem(line)
             if len(self.creation_record) <= 0:
                 self.undoButton.setEnabled(False)
+                self.widthsButton.setEnabled(False)
+            elif self.creation_record[-1] == 'l':
+                self.widthsButton.setEnabled(True)
+            else:
+                self.widthsButton.setEnabled(False)
         
     def export_measurements(self):
         # Gets largest image dimension and divides it by its on screen dimension?
@@ -712,6 +722,10 @@ class imwin(QGraphicsView):  #Subclass QLabel for interaction w/ QPixmap
                     path.cubicTo(P0, P1, P2)
                     undolines.append(self.scene.addPath(path))
                 self.linear.append(undolines)
+            else:   # For piecewise undo
+                self.lines.append(self.scene.testline)
+                self.linear.append(self.lines)
+                self.lines = [] # clear lines cache
 
             self.lengths.extend([np.nan])
 
@@ -915,7 +929,6 @@ class imwin(QGraphicsView):  #Subclass QLabel for interaction w/ QPixmap
                 self.scene.polyItem = False #remove mouseover polygon
                 self.scene.addItem(self.scene.polyItem2) #shade in polygon
                 self.areas.append(self.scene.polyItem2)
-                print("LINES: ", self.lines)
                 self.lines.append(self.scene.testline)
                 self.areas.append(self.lines)
                 self.lines = []                 # Clear array for undo
