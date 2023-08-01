@@ -422,19 +422,23 @@ class MainWindow(QMainWindow):
                 lines = self.iw.linear.pop()
                 for line in lines:
                     self.iw.scene.removeItem(line)
+                self.iw.lengths.pop()
             elif item == "pl":   # Undo piecewise length
                 self.lengthNames.pop()
                 lines = self.iw.linear.pop()
                 for line in lines:
                     self.iw.scene.removeItem(line)
+                self.iw.lengths.pop()
             elif item == "ar":  # Undo Area
                 self.areaNames.pop()
+                self.iw.areaValues = np.delete(self.iw.areaValues,-1)
                 lines = self.iw.areas.pop()
                 for line in lines:
                     self.iw.scene.removeItem(line)
                 poly = self.iw.areas.pop()   
                 self.iw.scene.removeItem(poly)
             elif item == "an": # Undo Angle
+                self.iw.angleValues = np.delete(self.iw.angleValues,-1)
                 self.angleNames.pop()
                 for line in self.iw.angles.pop():
                     self.iw.scene.removeItem(line)
@@ -689,8 +693,8 @@ class imwin(QGraphicsView):  #Subclass QLabel for interaction w/ QPixmap
 
     def mouseDoubleClickEvent(self, event):
         #only delete lines if bezier fit
-        if self.measuring_length and self.parent().bezier.isChecked() and (len(np.vstack((self.L.x, self.L.y)).T) > 2):
-            self.parent().statusbar.showMessage('Length measurement complete.')
+        if self.measuring_length and self.parent().bezier.isChecked() and (len(np.vstack((self.L.x, self.L.y)).T) > 1):
+            
             #Remove most recent items drawn (exact lines)
             nl = self.line_count
             for k, i in enumerate(self.scene.items()):
@@ -701,6 +705,7 @@ class imwin(QGraphicsView):  #Subclass QLabel for interaction w/ QPixmap
             # catmull roms spline instead?
             # or rational bezier curve - tuneable approximating/interpolating. ref. wikipedia
             # https://codeplea.com/introduction-to-splines
+            self.parent().statusbar.showMessage('Length measurement complete.')
 
             if (self.parent().bezier.isChecked()) and (len(np.vstack((self.L.x, self.L.y)).T) > 1):
                 nt = 100 #max(1000, self.numwidths * 50)  #num of interpolating points
@@ -726,15 +731,21 @@ class imwin(QGraphicsView):  #Subclass QLabel for interaction w/ QPixmap
                     path.cubicTo(P0, P1, P2)
                     undolines.append(self.scene.addPath(path))
                 self.linear.append(undolines)
-            else:   # For piecewise undo
+            else:   # For piecewise undo and calculation
+
                 self.lines.append(self.scene.testline)
                 self.linear.append(self.lines)
+                cords = np.vstack((self.L.x, self.L.y)).T
+                totalL = 0
+                for i in range(cords.shape[0]-1):
+                    totalL += np.linalg.norm(cords[i] - cords[i+1])
+                self.lengths[-1] = totalL   # Store measurement
                 self.lines = [] # clear lines cache
 
             self.lengths.extend([np.nan])
 
         QApplication.setOverrideCursor(QtCore.Qt.CursorShape.ArrowCursor)  #change cursor
-        if self.parent().bezier.isChecked() or (len(np.vstack((self.L.x, self.L.y)).T) <= 2):
+        if self.parent().bezier.isChecked():
             #measure widths possible if bezier or if single piecewise segment
             self.parent().widthsButton.setEnabled(True)
 
