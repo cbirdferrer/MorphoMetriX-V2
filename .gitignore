@@ -535,3 +535,4 @@ morphometrix/build/windows/warn-windows.txt
 morphometrix/build/windows/windows.exe.manifest
 morphometrix/build/windows/xref-windows.html
 morphometrix/dist/MorphoMetriX.exe
+morphometrix/imwin.py
