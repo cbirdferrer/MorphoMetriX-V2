@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QApplication, QGraphicsView, QGraphicsScene, QGraphicsTextItem, QGraphicsLineItem, QGraphicsPixmapItem, QGraphicsEllipseItem, QGraphicsPolygonItem, QGraphicsItem
+from PySide6.QtWidgets import QApplication, QGraphicsView, QGraphicsScene, QGraphicsTextItem, QGraphicsLineItem, QGraphicsPixmapItem, QGraphicsPolygonItem
 from PySide6 import QtGui, QtCore
 from PySide6.QtGui import QFont, QPixmap
 from PySide6.QtCore import Qt, QLineF
@@ -7,8 +7,7 @@ from scipy.sparse import diags
 from scipy.optimize import root_scalar
 from itertools import cycle, islice
 import numpy as np
-import sys, os
-import types
+import sys, os, types
 
 # ------------------------------
 #   MorphoMetrix GraphicsView Class - Developed By:
@@ -32,6 +31,10 @@ consts.ELLIPSEITEM = 3
 consts.FONTITEM = 4
 consts.POLYGONITEM = 5
 
+# Side bias constants
+consts.SIDE_A = 0
+consts.SIDE_B = 1
+
 class imwin(QGraphicsView):
     def __init__(self, parent=None):
         super(imwin, self).__init__(parent)
@@ -49,7 +52,19 @@ class imwin(QGraphicsView):
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setTransformationAnchor(QGraphicsView.ViewportAnchor.AnchorUnderMouse)
-        self.setResizeAnchor(QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+
+    # New project
+    def new_project(self,image_path):
+        self.measurement_stack.clear()
+        self.measuring_state = None
+        self.pixmap = None
+        self.scene.clear()
+
+        self.pixmap = QtGui.QPixmap(image_path)
+        self.scene.addPixmap(self.pixmap)
+        self.setSceneRect(QtCore.QRectF(0.0, 0.0, self.pixmap.width(), self.pixmap.height()))   # Set Scenerect to size of pixmap
+        self.fitInView(self.scene.sceneRect(), QtCore.Qt.AspectRatioMode.KeepAspectRatio)
+        self.scene.update()
 
     # Push command(s) to stack
     def push_stack(self, name, measurement_type):
@@ -88,17 +103,18 @@ class imwin(QGraphicsView):
 
         self.scene.addPixmap(self.pixmap)   # Add pixmap
         
-        for measurement in self.measurement_stack:  # For every measurement object
-            for item in measurement.get_objects():  # For every object
+        for measurement in self.measurement_stack:  # For every measurement
+            for item in measurement.get_objects():  # For every object in measurement
                 match item["type"]:
                     case consts.LINEITEM:
                         self.scene.addItem(QGraphicsLineItem(item["parms"]))
                     case consts.ELLIPSEITEM:
+                        item["parms"].update_scale(self.slider_pos)
                         self.scene.addItem(item["parms"])
                     case consts.PATHITEM:
                         self.scene.addPath(item["parms"])
                     case consts.POLYGONITEM:
-                        ellipse = QGraphicsPolygonItem(["parms"])
+                        ellipse = QGraphicsPolygonItem(item["parms"])
                         ellipse.setBrush(QtGui.QBrush(QtGui.QColor(255,255,255,127)))
                         self.scene.addItem(ellipse)
                     case consts.FONTITEM:
@@ -109,48 +125,50 @@ class imwin(QGraphicsView):
                         textItem = QGraphicsTextItem(item["parms"])
                         textItem.setFont(font)
                         textItem.setPos(item["pos"])
-                        self.scene.addItem(textItem)
-                        
+                        self.scene.addItem(textItem)         
         self.update_application()
 
+    # Updates GUI elements (Mouse pointer, toolbar toggles, etc.) after drawing to screen
     def update_application(self):
+        # Update mouse cursor
         if self.dragMode() == QGraphicsView.DragMode.ScrollHandDrag:
             QApplication.setOverrideCursor(QtCore.Qt.CursorShape.ClosedHandCursor)
         elif self.measuring_state:
             QApplication.setOverrideCursor(QtCore.Qt.CursorShape.CrossCursor)  #change cursor
         else:
             QApplication.setOverrideCursor(QtCore.Qt.CursorShape.ArrowCursor)
+        
+        # Update Toolbar
+        if len(self.measurement_stack) > 0:
+            self.parent().enable_undo()
+            self.parent().enable_export()
+        else:
+            self.parent().disable_undo()
+            self.parent().disable_export()
+
+        self.parent().clear_button_highlights()
+        self.parent().disable_all_measurements()
+        if self.measuring_state:
+            # Disable all buttons but undo
+            self.parent().highlight_measurement(self.measuring_state)
+        else:  
+            # Enable all buttons but width
+            self.parent().enable_all_measurements()
+            # If last measurement was length
+            if len(self.measurement_stack) > 0 and self.measurement_stack[-1].objects_params[-1]["type"] == consts.PATHITEM:
+                self.parent().enable_width_measurement()    # Enable width button     
 
     # Changes size of ellipses drawn on screen
     # Called from MainWindow
     def slider_moved(self, value):
         self.slider_pos = value
+        self.draw_scene()
                 
-    # Calculates width between corresponding ellipses
-    # Calculates distance in pixels and appends widths[] list
-    def calculate_widths(self,bias):
-        for x in range(0,len(self.ellipses)):   # iterate over every group of ellipses
-            calculated_widths = []
-            for y in range(0,len(self.ellipses[x]),2):  # Iterate over every ellipse in group (might be causing incorrect amount at export issue)
-                if bias == 'None':
-                    width = np.sqrt(
-                            (self.ellipses[x][y].scenePos().x() - self.ellipses[x][y+1].scenePos().x())**2 +
-                            (self.ellipses[x][y].scenePos().y() - self.ellipses[x][y+1].scenePos().y())**2)  #calculate width of entire line
-                elif bias == 'Side A':
-                    width = np.sqrt(
-                            ((self.ellipses[x][y].scenePos().x() - self.ellipses[x][y].cetnerLinePoint.x())*2)**2 +
-                            ((self.ellipses[x][y].scenePos().y() - self.ellipses[x][y].cetnerLinePoint.y())*2)**2)  #calculate width of entire line
-                else:   # Bias B
-                    width = np.sqrt(
-                            ((self.ellipses[x][y+1].scenePos().x() - self.ellipses[x][y+1].cetnerLinePoint.x())*2)**2 +
-                            ((self.ellipses[x][y+1].scenePos().y() - self.ellipses[x][y+1].cetnerLinePoint.y())*2)**2)  #calculate width of entire line
-                calculated_widths.append(width) # Stored widths in temporary array
-            self.widths.append(calculated_widths)    # Output is in Pixels
-
+    # Activated every key press
     def keyPressEvent(self, event):  #shift modifier for panning
         if event.key() == QtCore.Qt.Key.Key_Shift:
             pos = QtGui.QCursor.pos()
-            self.dragPos = self.mapToScene(self.mapFromGlobal(pos))
+            self.dragPos = self.mapToGlobal(self.mapFromGlobal(pos))
             self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
             self.update_application()
             
@@ -182,9 +200,8 @@ class imwin(QGraphicsView):
 
     # Used by mousemoveevent
     # Checks if QLineF's in area measurement intersect
-    # Handles add/removal of area ellipse
+    # Handles add/removal of area polygon
     def intersect_handler(self, measurement):
-
         # Check if area ellipse already exists (Should always be last appended item)
         if measurement.objects_params[-1]["type"] == consts.POLYGONITEM:
             measurement.rem_object()
@@ -207,7 +224,7 @@ class imwin(QGraphicsView):
                     return  # end intersect check
 
     # Used by Mousemoveevent
-    # Updates point 2 of last measured object to mousePos
+    # Updates point #2 of last lineItem object to mousePos
     def update_prev_lineitem(self, cur_measurment):
         mousePos = self.mapToScene(self.mapFromGlobal(QtGui.QCursor.pos()))
         last_pos = cur_measurment.objects_params[-1]["parms"].p1()
@@ -226,11 +243,10 @@ class imwin(QGraphicsView):
                     "type": consts.LINEITEM
                     })
                 self.calculate_curve()
+            else:
+                self.calculate_length(cur_measurment)
             self.measuring_state = None # Reset to default values
-
         self.draw_scene()
-        # Check if linear measurement state
-        # Draw to scene depending on state
         # Update status bar with "X measurement complete"
 
     # Called every mouse click in scene
@@ -243,16 +259,17 @@ class imwin(QGraphicsView):
                     self.add_line_item(cur_measurment,mousePos)
                 case consts.ANGLE:
                     if cur_measurment.has_objects() and len(cur_measurment.get_objects()) >= 2:
+                        self.calculate_angle(cur_measurment)
                         self.measuring_state = None
                     else:
                         self.add_line_item(cur_measurment,mousePos)
                 case consts.AREA:
                     if cur_measurment.has_objects() and cur_measurment.objects_params[-1]["type"] == consts.POLYGONITEM:
+                        self.calculate_area(cur_measurment)
                         self.measuring_state = None
                     else:
                         self.add_line_item(cur_measurment,mousePos)
             self.draw_scene()
-        
         super().mousePressEvent(event)
 
     # Adds line item to measurement
@@ -290,7 +307,7 @@ class imwin(QGraphicsView):
         B = bezier(t, P, k = kb) #evaluate bezier curve along t
         Q = kb*np.diff(P, axis = 0)
         
-        measurement.measurement_length = gauss_legendre(b = 1, f = bezier, P = Q, k = kb - 1, arc = True) #compute total arc length.
+        measurement.measurement_value = gauss_legendre(b = 1, f = bezier, P = Q, k = kb - 1, arc = True) #compute total arc length.
         measurement.Q = Q
         measurement.kb = kb
         measurement.P = P
@@ -309,16 +326,77 @@ class imwin(QGraphicsView):
                         "parms": path,
                         "type": consts.PATHITEM
                         })
+            
+    # Calculate total length of length measurement
+    def calculate_length(self, measurement):
+        measurement.measurement_value = sum([l["parms"].length() for l in measurement.objects_params])
+
+    # Calculate qreal (PySide degrees) of a finished angle measurement
+    def calculate_angle(self, measurement):
+        lines = measurement.get_objects()
+        measurement.measurement_value = lines[0]["parms"].angleTo(lines[1]["parms"])
+
+    def calculate_area(self, measurement):
+        qpolygon = measurement.objects_params[-1]["parms"]
+
+        # Shoelace formula: https://www.theoremoftheday.org/GeometryAndTrigonometry/Shoelace/TotDShoelace.pdf
+        S1 = sum((qpolygon[i].x()*qpolygon[i+1].y())-(qpolygon[i].y()*qpolygon[i+1].x()) for i in range(len(qpolygon)-1))
+        conct = (qpolygon[-1].x()*qpolygon[0].y())-(qpolygon[-1].y()*qpolygon[0].x())
+        measurement.measurement_value = 0.5*abs(S1+conct)
+
+    # Calculates distance in pixels of wdiths measurement
+    # Calculate on export due to MovingEllipse being a dynamic item
+    def calculate_widths(self,bias):
+        for measurement in self.measurement_stack:  # For every measurement
+            if measurement.get_type() == consts.WIDTH:  # Find width measurements
+                width_array = []
+                side_A_width = []
+                side_B_width = []
+                for item in measurement.get_objects():
+                    if item["type"] == consts.ELLIPSEITEM:
+                        match item["parms"].side:
+                            case consts.SIDE_A:
+                                side_A_width.append(item["parms"])
+                            case consts.SIDE_B:
+                                side_B_width.append(item["parms"])
+    
+                for A,B in zip(side_A_width,side_B_width):
+                    match bias:
+                        case "Side A":
+                            width_array.append(QLineF(A.scenePos(), A.centerLinePoint).length())
+                        case "Side B":
+                            width_array.append(QLineF(B.scenePos(),B.centerLinePoint).length())
+                        case _: # None
+                            width_array.append(QLineF(A.scenePos(),B.scenePos()).length())
+                measurement.measurement_value = width_array    # Calculated in pixels
+
+    # Iterates over measurement stack to return names and values of measurements
+    def get_measurement_names_and_values(self, m):
+        pixel_measurement = []
+        unit_measurement = []   # meters
+        for measurement in self.measurement_stack:
+            match measurement.get_type():
+                case consts.WIDTH:
+                    num_widths = len(measurement.measurement_value)
+                    for i in range(num_widths):
+                        pixel_measurement.append([measurement.get_name()+"_w"+"{0:.1f}".format((i+1)/num_widths),"{0:.2f}".format(measurement.measurement_value[i]), "Pixels"])
+                        unit_measurement.append([measurement.get_name()+"_w"+"{0:.1f}".format((i+1)/num_widths), "{0:.2f}".format(measurement.measurement_value[i]*m), "Meters"])
+                case consts.LENGTH:
+                    pixel_measurement.append([measurement.get_name(),"{0:.2f}".format(measurement.measurement_value), "Pixels"])
+                    unit_measurement.append([measurement.get_name(), "{0:.2f}".format(measurement.measurement_value*m), "Meters"])
+                case consts.ANGLE:
+                    pixel_measurement.append([measurement.get_name(), "{0:.2f}".format(measurement.measurement_value), "Degrees"])
+                    unit_measurement.append([measurement.get_name(), "{0:.2f}".format(measurement.measurement_value), "Degrees"])
+                case consts.AREA:
+                    pixel_measurement.append([measurement.get_name(), "{0:.2f}".format(measurement.measurement_value), "Pixels"])
+                    unit_measurement.append([measurement.get_name(), "{0:.2f}".format(measurement.measurement_value*m), "Square Meters"])
+        return pixel_measurement, unit_measurement
 
     # Measure widths of aquatic animal (Called when GUI button is pressed)
-    # - Determines intersect points
-    # - Create draggable ellipses
-    def measure_widths(self, name):
-        # Check if stack exists and last measurement is a benzier curve
-        
+    def measure_widths(self):        
         if len(self.measurement_stack) > 0 and self.measurement_stack[-1].measurement_type == consts.LENGTH:
             last_measurement = self.measurement_stack[-1]
-            self.push_stack(name, 4)
+            self.push_stack(last_measurement.get_name(), 4)
             width_measurement = self.measurement_stack[-1]
             numwidths = int(self.parent().subWin.numwidths.text())-1
             k = 0
@@ -327,7 +405,7 @@ class imwin(QGraphicsView):
                 'Drag width segment points to make width measurements perpendicular to the length segment'
             )
             s_i = np.linspace(0,1,numwidths+2)[1:-1]    #only need to draw widths for inner pts
-            t_i = np.array([root_scalar(gauss_legendre, x0 = s_i, bracket = [-1,1], method = "bisect", args = (bezier, last_measurement.Q, last_measurement.kb-1, True, s, last_measurement.measurement_length) ).root for s in s_i])
+            t_i = np.array([root_scalar(gauss_legendre, x0 = s_i, bracket = [-1,1], method = "bisect", args = (bezier, last_measurement.Q, last_measurement.kb-1, True, s, last_measurement.measurement_value) ).root for s in s_i])
             B_i = bezier(np.array(t_i), P = last_measurement.P, k = last_measurement.kb)
 
             #Find normal vectors by applying pi/2 rotation matrix to tangent vector
@@ -381,7 +459,7 @@ class imwin(QGraphicsView):
                                 "type": consts.FONTITEM
                             })
                     width_measurement.append_object({   # Append Ellipse
-                                "parms": MovingEllipse(self, start, end, self.slider_pos),
+                                "parms": MovingEllipse(self, start, end, self.slider_pos, l%2),
                                 "type": consts.ELLIPSEITEM
                             })
                     width_measurement.append_object({   # Append Line
@@ -449,22 +527,23 @@ def resource_path(relative_path):
 # Ellipse is bound to parent line
 # Input: Point P1 (QPointF), Point P2 (QPointF)
 class MovingEllipse(QGraphicsPixmapItem):
-    def __init__(self, parent,lp1, lp2, scale):
+    def __init__(self, parent,lp1, lp2, scale, side):
         # LP2 is always border point (PyQt6.QtCore.QPointF(1030.9353133069922, 0.0))
         super(MovingEllipse,self).__init__()
 
         scaledSize = int(parent.scene.height()/80) + (scale*10)
         Image = QPixmap(resource_path("crosshair.png")).scaled(scaledSize,scaledSize)
+        self.color = parent.picked_color
         self.Pixmap = QPixmap(Image.size())
-        self.Pixmap.fill(parent.picked_color)
+        self.Pixmap.fill(self.color)
         self.Pixmap.setMask(Image.createMaskFromColor(Qt.GlobalColor.transparent))
 
         self.setPixmap(self.Pixmap)
         self.setOffset(QtCore.QPointF(-scaledSize/2,-scaledSize/2)) # Set offset to center of image
-        self.midPoint = (lp1 + lp2)/2    # QPointF
-        self.cetnerLinePoint = lp1  # Used in
-
-        self.p1 = lp1
+        
+        self.centerLinePoint = lp1  # Used in width measurement
+        self.side = side
+        self.p1 = lp1   # Boundry points
         self.p2 = lp2
 
         self.parent = parent            # Used for updating widths measurement
@@ -487,7 +566,7 @@ class MovingEllipse(QGraphicsPixmapItem):
         scaledSize = int(self.parent.scene.height()/60) + (scale*10)
         Image = QPixmap(resource_path("crosshair.png")).scaled(scaledSize,scaledSize)
         self.Pixmap = QPixmap(Image.size())
-        self.Pixmap.fill(self.parent.picked_color)
+        self.Pixmap.fill(self.color)
         self.Pixmap.setMask(Image.createMaskFromColor(Qt.GlobalColor.transparent))
 
         self.setPixmap(self.Pixmap)
@@ -512,7 +591,6 @@ class MovingEllipse(QGraphicsPixmapItem):
 
     # Mouse Hover
     def hoverEnterEvent(self, event):
-        #print("Hover")
         QApplication.setOverrideCursor(QtCore.Qt.CursorShape.OpenHandCursor)
 
     # Mouse Stops Hovering
@@ -531,8 +609,8 @@ class MovingEllipse(QGraphicsPixmapItem):
 
             # Update position of Ellipse to match mouse
 
-            ell_y = updated_curs_pos.y() - orig_curs_pos.y() + orig_pos.y()
-            ell_x = updated_curs_pos.x() - orig_curs_pos.x() + orig_pos.x()
+            ell_y = updated_curs_pos.y()# - orig_curs_pos.y() + orig_pos.y()
+            ell_x = updated_curs_pos.x()# - orig_curs_pos.x() + orig_pos.x()
 
             # Use X of mouse when line is horizontal, and Y when verticle
             if self.m > -0.5 and self.m < 0.5:
@@ -590,20 +668,17 @@ def gauss_legendre(b, f, P, k, arc, loc = 0.0, L = 1, degree = 24, a = 0):
 # Class to hold measurement of objects and current states for prcedural QGraphicScene
 class Measurement():
 
-    # Pass list of commands along with tag
-    # states = states of graphics scene
-    # objects = List of QGraphicsItem objects
     def __init__(self, mt, name):
         self.measurement_type = mt
         self.measurement_name = name
         self.objects_params = []
+        self.measurement_value = None
 
         # Items used by width measurement
         self.Q = None
         self.kb = None
         self.l = None
         self.P = None
-        self.measurement_length = None
 
     # Return dict containing state of scene at time of measurement
     def get_type(self):

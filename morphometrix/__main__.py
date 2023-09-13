@@ -1,5 +1,5 @@
 #usr/bin/env python
-import os, sys, csv, traceback, platform
+import os, sys, csv, traceback, platform, types
 from datetime import date
 import numpy as np
 import webbrowser
@@ -7,7 +7,7 @@ from graphicsview import imwin, resource_path
 
 from PySide6 import QtGui, QtCore
 from PySide6.QtWidgets import QSlider ,QColorDialog ,QComboBox, QMainWindow, QApplication,  QWidget, QToolBar, QPushButton, QLabel, QLineEdit, QPlainTextEdit, QGridLayout, QFileDialog, QMessageBox, QInputDialog, QDockWidget, QSizePolicy, QRadioButton
-from PySide6.QtGui import QShortcut, QIcon, QUndoCommand
+from PySide6.QtGui import QShortcut, QIcon
 from PySide6.QtCore import Qt
 
 # ------------------------------
@@ -17,12 +17,19 @@ from PySide6.QtCore import Qt
 #       Clara Bird
 #       Elliott Chimienti
 # ------------------------------
-#   Packages (Universal2 Python Install and Wheels for MacOS!):
+#   Packages (Used Universal2 Python install with universal2 Wheels for MacOS):
 #   Python 3.10.8
 #   PySide6 6.5.1
 #   Numpy 1.21.6
 #   Scipy 1.9.1
 # ------------------------------
+
+consts = types.SimpleNamespace()
+# State case constants
+consts.LENGTH = 1
+consts.AREA = 2
+consts.ANGLE = 3
+consts.WIDTH = 4
 
 class Window(QWidget):
 
@@ -121,8 +128,6 @@ class Window(QWidget):
         if choice == QMessageBox.StandardButton.Yes:
             self.parent().deleteLater()
             self.parent().close()
-        else:
-            pass
 
 #references:
 #https://stackoverflow.com/questions/26901540/arc-in-qgraphicsscene/26903599#26903599
@@ -133,6 +138,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.setWindowIcon(QIcon(resource_path("icon.PNG")))
         self.setWindowTitle("MorphoMetriX")
+
         D = self.screen().availableGeometry()
         self.move(0,0)#center.x() + .25*D.width() , center.y() - .5*D.height() )
         self.resize( int(.95*D.width()), int(6*D.height()) )
@@ -147,9 +153,7 @@ class MainWindow(QMainWindow):
 
         #Stacked dock widgets
         docked1 = QDockWidget("", self)
-        docked2 = QDockWidget("", self)
         self.addDockWidget(QtCore.Qt.DockWidgetArea.LeftDockWidgetArea, docked1)
-        self.addDockWidget(QtCore.Qt.DockWidgetArea.LeftDockWidgetArea, docked2)
         docked1.setWidget(self.subWin)
         docked1.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetFloatable)
 
@@ -157,8 +161,7 @@ class MainWindow(QMainWindow):
         self.setCorner(QtCore.Qt.Corner.TopRightCorner, QtCore.Qt.DockWidgetArea.RightDockWidgetArea)
         self.setCorner(QtCore.Qt.Corner.BottomLeftCorner, QtCore.Qt.DockWidgetArea.LeftDockWidgetArea)
         self.setCorner(QtCore.Qt.Corner.BottomRightCorner, QtCore.Qt.DockWidgetArea.RightDockWidgetArea)
-        self.resizeDocks( (docked1,docked2), (400,400), QtCore.Qt.Orientation.Horizontal )
-
+        self.resizeDocks( [docked1], [400], QtCore.Qt.Orientation.Horizontal )
         self.exportButton = QPushButton("Export Measurements", self)
         self.exportButton.clicked.connect(self.export_measurements)
         self.exportButton.setEnabled(False)
@@ -169,7 +172,7 @@ class MainWindow(QMainWindow):
         self.lengthButton = QPushButton("Measure Length", self)
         self.lengthButton.clicked.connect(self.measure_length)
         self.lengthButton.setEnabled(False)
-        #self.lengthButton.setCheckable(True)
+        self.lengthButton.setCheckable(True)
         self.lengthNames = []
 
         self.widthsButton = QPushButton("Measure Widths", self)
@@ -180,13 +183,13 @@ class MainWindow(QMainWindow):
         self.areaButton = QPushButton("Measure Area", self)
         self.areaButton.clicked.connect(self.measure_area)
         self.areaButton.setEnabled(False)
-        # self.areaButton.setCheckable(True)
+        self.areaButton.setCheckable(True)
         self.areaNames = []
 
         self.angleButton = QPushButton("Measure Angle", self)
         self.angleButton.clicked.connect(self.measure_angle)
         self.angleButton.setEnabled(False)
-        # self.angleButton.setCheckable(True)
+        self.angleButton.setCheckable(True)
         self.angleNames = []
 
         shortcut_polyClose = QShortcut(QtGui.QKeySequence(QtCore.Qt.Key.Key_Tab), self)
@@ -226,196 +229,130 @@ class MainWindow(QMainWindow):
     # New Project
     # Set all defaults and clear stored values
     def file_open(self):
-
-        self.iw.scene.clear()
         self.image_name = QFileDialog.getOpenFileName(self, 'Open File')
-        self.iw.pixmap = QtGui.QPixmap(self.image_name[0])
-        self.iw.pixmap = self.iw.pixmap.scaled(
-            self.iw.pixmap.width(),
-            self.iw.pixmap.height(),
-            QtCore.Qt.AspectRatioMode.KeepAspectRatio,
-            QtCore.Qt.TransformationMode.SmoothTransformation)
-        self.iw.scene.addPixmap(self.iw.pixmap)  #add image
-        # self.iw.setScene(self.iw.scene)
 
-        #Adjust window size automatically?
-        self.iw.fitInView(self.iw.scene.sceneRect(), QtCore.Qt.AspectRatioMode.KeepAspectRatio)
-        self.iw.scene.update()
-        self.statusbar.showMessage('Select a measurement to make from the toolbar')
-
+        if self.image_name[0]: # If user selected a file, create new project
+            self.iw.new_project(self.image_name[0])
+            self.statusbar.showMessage('Select a measurement to make from the toolbar')
+            self.enable_all_measurements()
+    
+    # Enable all measurement buttons
+    def enable_all_measurements(self):
         self.lengthButton.setEnabled(True)
         self.areaButton.setEnabled(True)
         self.angleButton.setEnabled(True)
-        self.exportButton.setEnabled(True)
-        self.undoButton.setEnabled(False)
-        self.bezier.setEnabled(True)
-        self.bezier.setChecked(True)
+
+    def enable_width_measurement(self):
         self.widthsButton.setEnabled(True)
 
+    # Remove highlighted status from all buttons
+    def clear_button_highlights(self):
+        self.lengthButton.setChecked(False)
+        self.areaButton.setChecked(False)
+        self.angleButton.setChecked(False)
+        self.widthsButton.setChecked(False)
+
+    # Highlight selected button
+    def highlight_measurement(self, measurement):
+        match measurement:
+            case consts.LENGTH:
+                self.lengthButton.setEnabled(True)
+                self.lengthButton.setChecked(True)
+            case consts.AREA:
+                self.areaButton.setEnabled(True)
+                self.areaButton.setChecked(True)
+            case consts.ANGLE:
+                self.angleButton.setEnabled(True)
+                self.angleButton.setChecked(True)
+
+    # Disable all measurement buttons
+    def disable_all_measurements(self):
+        self.lengthButton.setEnabled(False)
+        self.areaButton.setEnabled(False)
+        self.angleButton.setEnabled(False)
+        self.widthsButton.setEnabled(False)
+
+    # Enable undo button
+    def enable_undo(self):
+        self.undoButton.setEnabled(True)
+
+    # Disable undo button
+    def disable_undo(self):
+        self.undoButton.setEnabled(False)
+
+    # Enable export button
+    def enable_export(self):
+        self.exportButton.setEnabled(True)
+
+    # Disable export button
+    def disable_export(self):
+        self.exportButton.setEnabled(False)
+
+    # Call length function within graphicsview
     def measure_length(self):
-        self.lel = QLineEdit(self)
-        self.lel.move(130, 22)
         text, ok = QInputDialog.getText(self, 'Input Dialog', 'Length name')
-
         if ok:
-            self.lel.setText(str(text))
-            self.lengthNames.append(self.lel.text())
-
-            self.undoButton.setEnabled(True)
-            # QApplication.setOverrideCursor(QtCore.Qt.CursorShape.CrossCursor)  #change cursor
-            self.iw.push_stack(self.lel.text(),1)
+            self.iw.push_stack(text,1)
             self.statusbar.showMessage('Click initial point for length measurement')
-        else:
-            self.lengthButton.setChecked(False)
 
+    # Call widths function within graphicsview class
     def measure_widths(self):
-        # self.iw.push_stack(, 3) # 3 = Ellipse item
-        self.iw.measure_widths(self.lengthNames[-1])  # Call width function within graphics view
+        self.iw.measure_widths()  # Call width function within graphics view
 
+    # Call angle function within graphicsview class
     def measure_angle(self):
-        self.lea = QLineEdit(self)
-        self.lea.move(130, 22)
         text, ok = QInputDialog.getText(self, 'Input Dialog', 'Angle name')
-
         if ok:
-            self.lea.setText(str(text))
-            # self.angleNames.append(self.lea.text())
-            self.undoButton.setEnabled(True)
-            # QApplication.setOverrideCursor(QtCore.Qt.CursorShape.CrossCursor)  #change cursor
-            self.bezier.setEnabled(False)
             self.statusbar.showMessage('Click initial point for angle measurement')
             self.iw.push_stack(text,3)
-        else:
-            self.angleButton.setChecked(False)
-
+            
+    # Call area function within graphicsview class
     def measure_area(self):
-
-        self.lea = QLineEdit(self)
-        self.lea.move(130, 22)
         text, ok = QInputDialog.getText(self, 'Input Dialog', 'Area name')
-
         if ok:
-            self.lea.setText(str(text))
-            self.areaNames.append(self.lea.text())
-            self.undoButton.setEnabled(True)
             self.iw.push_stack(text,2)               # 2 == AREA
             self.statusbar.showMessage('Click initial point for area measurement')
-        else:
-            self.areaButton.setChecked(False)
 
-    # Create linked list (creation_record) of PyQt objects drawn to screen in order of creation
-    # Pop length, angle, area, or width measurement lists depending on pop object in creation_record
+    # Call undo function within graphicsview class
     def undo(self):
         self.iw.undo()
         
     def export_measurements(self):
-        # Gets largest image dimension and divides it by its on screen dimension?
-        fac = max(self.iw.pixmap.width(), self.iw.pixmap.height()) / max(
-            self.iw.pixmap_fit.width(),
-            self.iw.pixmap_fit.height())  #scale pixel -> m by scaled image
         # Popup to get user save file input
         name = QFileDialog.getSaveFileName(
             self, 'Save File', self.image_name[0].split('.', 1)[0])[0]
-        self.pixeldim = float(self.subWin.pixeldim.text())
-        self.altitude = float(self.subWin.altitude.text())
-        self.focal = float(self.subWin.focal.text())
-        #okay in mm https://www.imaging-resource.com/PRODS/sony-a5100/sony-a5100DAT.HTM
+        pixeldim = float(self.subWin.pixeldim.text())
+        altitude = float(self.subWin.altitude.text())
+        focal = float(self.subWin.focal.text())
+        # Convert in mm https://www.imaging-resource.com/PRODS/sony-a5100/sony-a5100DAT.HTM
         if name:
-            #Convert pixels to meters
-            areas = self.iw.areaValues * (
-                fac * self.pixeldim * self.altitude / self.focal)**2
-            values_optical = np.array([
-                self.subWin.id.text(), self.image_name[0], self.focal,
-                self.altitude, self.pixeldim
-            ])
-
-            names_optical = [
-                'Image ID', 'Image Path', 'Focal Length', 'Altitude',
-                'Pixel Dimension'
-            ]
+            meta_data = [["Object","Value","Value_unit"],
+                        ['Image ID',self.subWin.id.text(),"Metadata"],
+                        ['Image Path',self.image_name[0],"Metadata"],
+                        ['Focal Length', focal,"Metadata"],
+                        ['Altitude', altitude,"Metadata"],
+                        ['Pixel Dimension', pixeldim,"Metadata"],
+                        ['Mirror Side', self.subWin.side_bias.currentText(), "Metadata"],
+                        ['Notes', self.subWin.notes.toPlainText(), "Metadata"]]
 
 	        #Write .csv file
-            print(f"Writing {name} to file")
             with open(name + '.csv', 'w', newline='') as csvfile:
                 writer = csv.writer(csvfile)
-                writer.writerow(["Object","Value","Value_unit"])  # Define Columns
 
-                # Writes image & flight data
-                for (f, g) in zip(names_optical, values_optical):
-                    writer.writerow([f, g, "Metadata"])
-                writer.writerow(['Mirror Side', self.subWin.side_bias.currentText(), "Metadata"])     # Side Bias (Not implemented yet)
-                writer.writerow(['Notes', self.subWin.notes.toPlainText(), "Metadata"])     # Notes
+                writer.writerows(meta_data)     # Writes flight data and metadata
 
-                # Initial output in meters, then pixels
-                self.iw.widths.clear() # Clear array for output
                 self.iw.calculate_widths(self.subWin.side_bias.currentText())      # Calculate widths of MovingEllipses at export
-                # Measurements in meters  \/ \/ \/ --------------------------------------------
-                # Make check for first length line
-                if self.lengthNames:
-                    width_index = 0
-                    for k,m in enumerate(self.lengthNames):
-                        l = "{0:.2f}".format(self.iw.lengths[k] * fac * self.pixeldim * self.altitude / self.focal)
-                        writer.writerow([m,l, "Meters"])  # Writes [Length Name][Length Measurement meters][Length measurement pixels]
-                        if width_index < len(self.widthNames) and self.widthNames[width_index] == m: # Check if current length has widths or if width exists
-                            # Iterate over width measurements
-                            for idx,width in enumerate(self.iw.widths[width_index]):
-                                l = "{0:.2f}".format(width * fac * self.pixeldim * self.altitude / self.focal)
-                                width_percent = "{0:.1f}".format(((idx+1)/(len(self.iw.widths[width_index])+1))*100)
-                                writer.writerow([self.widthNames[width_index]+"_w"+str(width_percent),l,"Meters"])
-                            width_index += 1 # Incease index
-
-                # Write angles (Fix output)
-                for k, f in enumerate(self.angleNames):
-                    line = "{0:.2f}".format(self.iw.angleValues[k])
-                    writer.writerow([f,line, "Degrees"])
-
-                # Write Area ()
-                for k, f in enumerate(self.areaNames):
-                    line = "{0:.2f}".format(areas[k])
-                    writer.writerow([f,line,"Square Meters"])
-
-                # Measurements in pixels \/ \/ \/ --------------------------------------------
-                # Make check for first length line
-                if self.lengthNames:
-                    width_index = 0
-                    for k,m in enumerate(self.lengthNames):
-                        l = "{0:.2f}".format(self.iw.lengths[k])    # Pixels
-                        writer.writerow([m,l, "Pixels"])  # Writes [Length Name][Length Measurement meters][Length measurement pixels]
-                        if width_index < len(self.widthNames) and self.widthNames[width_index] == m: # Check if current length has widths or if width exists
-                            # Iterate over width measurements
-                            for idx,width in enumerate(self.iw.widths[width_index]):
-                                l = "{0:.2f}".format(width)
-                                width_percent = "{0:.1f}".format(((idx+1)/(len(self.iw.widths[width_index])+1))*100)
-                                writer.writerow([self.widthNames[width_index]+"_w"+str(width_percent),l,"Pixels"])
-                            width_index += 1 # Incease index
-
-                # Write angles
-                for k, f in enumerate(self.angleNames):  #write angles
-                    line = "{0:.2f}".format(self.iw.angleValues[k])
-                    writer.writerow([f, line,"Degrees"])
-
-                # Write Area
-                for k, f in enumerate(self.areaNames):
-                    line = "{0:.2f}".format(self.iw.areaValues[k])
-                    writer.writerow([f,line,"Pixels"])
+                m = pixeldim * altitude / focal
+                pixel_measurements, unit_measurements = self.iw.get_measurement_names_and_values(m)
+                
+                writer.writerows(unit_measurements)
+                writer.writerows(pixel_measurements)
 
             #Export image
             self.iw.fitInView(self.iw.scene.sceneRect(), QtCore.Qt.AspectRatioMode.KeepAspectRatio)
             pix = QtGui.QPixmap(self.iw.viewport().size())
             self.iw.viewport().render(pix)
             pix.save(name + '-measurements.png')
-
-class angleData():  #actually need separate class from posdata? probably not
-
-    def __init__(self, t):
-        self.t = t
-
-    def update(self, add_t):
-        self.t = np.append(self.t, add_t)
-
-    def downdate(self):
-        self.t = self.t[:-1]
-
 
 # Crash handler for error logging
 def except_hook(exc_type, exc_value, exc_tb):
