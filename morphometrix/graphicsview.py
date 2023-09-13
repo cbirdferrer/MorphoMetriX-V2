@@ -76,7 +76,6 @@ class imwin(QGraphicsView):
     def undo(self):
         if len(self.measurement_stack) > 0:
             last_measurement = self.measurement_stack[-1]         # Grab latest object
-            
             if len(last_measurement.objects_params) == 1 or last_measurement.objects_params[-1]["type"] == consts.PATHITEM or last_measurement.get_type() == consts.WIDTH:
                 self.measurement_stack.pop()
                 self.measuring_state = None
@@ -88,11 +87,9 @@ class imwin(QGraphicsView):
                 self.measurement_stack.pop()
                 self.undo()                # Call self until graphics item is removed or no measurements
                 return                      # No need to update scene twice
-            
             self.draw_scene()               # Update scene after update
-            self.update_application()       # Update application characteristics
    
-    # Custom clear scene implementation to ignore ellipse items
+    # Custom clear scene implementation (Does not destroy custom ellipse class from memory)
     def clear_scene(self):
         for item in self.scene.items():
             self.scene.removeItem(item)
@@ -100,7 +97,6 @@ class imwin(QGraphicsView):
     # Re-draw QGraphicsView with commands from FIFO stack
     def draw_scene(self):
         self.clear_scene()  # Clear scene
-
         self.scene.addPixmap(self.pixmap)   # Add pixmap
         
         for measurement in self.measurement_stack:  # For every measurement
@@ -143,6 +139,7 @@ class imwin(QGraphicsView):
             self.parent().enable_undo()
             self.parent().enable_export()
         else:
+            self.parent().statusbar.showMessage('Select a measurement to make from the toolbar')
             self.parent().disable_undo()
             self.parent().disable_export()
 
@@ -236,6 +233,7 @@ class imwin(QGraphicsView):
         cur_measurment = self.measurement_stack[-1]
         if self.measuring_state == consts.LENGTH:
             # Check if bezier option is checked
+            self.parent().statusbar.showMessage('Length measurement complete.')
             if self.parent().bezier.isChecked():
                 last_pos = cur_measurment.objects_params[-1]["parms"].p2()
                 cur_measurment.append_object({
@@ -247,7 +245,6 @@ class imwin(QGraphicsView):
                 self.calculate_length(cur_measurment)
             self.measuring_state = None # Reset to default values
         self.draw_scene()
-        # Update status bar with "X measurement complete"
 
     # Called every mouse click in scene
     def mousePressEvent(self, event):
@@ -260,19 +257,21 @@ class imwin(QGraphicsView):
                 case consts.ANGLE:
                     if cur_measurment.has_objects() and len(cur_measurment.get_objects()) >= 2:
                         self.calculate_angle(cur_measurment)
+                        self.parent().statusbar.showMessage('Angle measurement complete')
                         self.measuring_state = None
                     else:
                         self.add_line_item(cur_measurment,mousePos)
                 case consts.AREA:
                     if cur_measurment.has_objects() and cur_measurment.objects_params[-1]["type"] == consts.POLYGONITEM:
                         self.calculate_area(cur_measurment)
+                        self.parent().statusbar.showMessage('Polygon area measurement completed')
                         self.measuring_state = None
                     else:
                         self.add_line_item(cur_measurment,mousePos)
             self.draw_scene()
         super().mousePressEvent(event)
 
-    # Adds line item to measurement
+    # Adds lineItem to measurement
     def add_line_item(self,measurement,mousePos):
         if measurement.has_objects():
             last_pos = measurement.objects_params[-1]["parms"].p2()
@@ -395,15 +394,13 @@ class imwin(QGraphicsView):
     # Measure widths of aquatic animal (Called when GUI button is pressed)
     def measure_widths(self):        
         if len(self.measurement_stack) > 0 and self.measurement_stack[-1].measurement_type == consts.LENGTH:
+            self.parent().statusbar.showMessage('Drag width segment points to make width measurements perpendicular to the length segment')
             last_measurement = self.measurement_stack[-1]
             self.push_stack(last_measurement.get_name(), 4)
             width_measurement = self.measurement_stack[-1]
             numwidths = int(self.parent().subWin.numwidths.text())-1
             k = 0
 
-            self.parent().statusbar.showMessage(
-                'Drag width segment points to make width measurements perpendicular to the length segment'
-            )
             s_i = np.linspace(0,1,numwidths+2)[1:-1]    #only need to draw widths for inner pts
             t_i = np.array([root_scalar(gauss_legendre, x0 = s_i, bracket = [-1,1], method = "bisect", args = (bezier, last_measurement.Q, last_measurement.kb-1, True, s, last_measurement.measurement_value) ).root for s in s_i])
             B_i = bezier(np.array(t_i), P = last_measurement.P, k = last_measurement.kb)

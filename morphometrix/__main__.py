@@ -256,12 +256,15 @@ class MainWindow(QMainWindow):
     def highlight_measurement(self, measurement):
         match measurement:
             case consts.LENGTH:
+                self.statusbar.showMessage('Click to place next point... double click to finish')
                 self.lengthButton.setEnabled(True)
                 self.lengthButton.setChecked(True)
             case consts.AREA:
+                self.statusbar.showMessage('Click to place next point... close polygon to finish')
                 self.areaButton.setEnabled(True)
                 self.areaButton.setChecked(True)
             case consts.ANGLE:
+                self.statusbar.showMessage('Click point to define vector')
                 self.angleButton.setEnabled(True)
                 self.angleButton.setChecked(True)
 
@@ -292,7 +295,7 @@ class MainWindow(QMainWindow):
     def measure_length(self):
         text, ok = QInputDialog.getText(self, 'Input Dialog', 'Length name')
         if ok:
-            self.iw.push_stack(text,1)
+            self.iw.push_stack(text,consts.LENGTH)
             self.statusbar.showMessage('Click initial point for length measurement')
 
     # Call widths function within graphicsview class
@@ -304,19 +307,21 @@ class MainWindow(QMainWindow):
         text, ok = QInputDialog.getText(self, 'Input Dialog', 'Angle name')
         if ok:
             self.statusbar.showMessage('Click initial point for angle measurement')
-            self.iw.push_stack(text,3)
+            self.iw.push_stack(text,consts.ANGLE)
             
     # Call area function within graphicsview class
     def measure_area(self):
         text, ok = QInputDialog.getText(self, 'Input Dialog', 'Area name')
         if ok:
-            self.iw.push_stack(text,2)               # 2 == AREA
+            self.iw.push_stack(text,consts.AREA)               # 2 == AREA
             self.statusbar.showMessage('Click initial point for area measurement')
 
     # Call undo function within graphicsview class
     def undo(self):
         self.iw.undo()
         
+    # Export measurements to csv
+    # Collect measurements from graphicsview
     def export_measurements(self):
         # Popup to get user save file input
         name = QFileDialog.getSaveFileName(
@@ -381,6 +386,7 @@ def except_hook(exc_type, exc_value, exc_tb):
                 file.write(tb)
 
     QApplication.quit() # Quit application
+
 
 def main():
     sys.excepthook = except_hook
