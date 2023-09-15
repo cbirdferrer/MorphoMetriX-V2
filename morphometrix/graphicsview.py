@@ -378,8 +378,8 @@ class imwin(QGraphicsView):
                 case consts.WIDTH:
                     num_widths = len(measurement.measurement_value)
                     for i in range(num_widths):
-                        pixel_measurement.append([measurement.get_name()+"_w"+"{0:.1f}".format((i+1)/num_widths),"{0:.2f}".format(measurement.measurement_value[i]), "Pixels"])
-                        unit_measurement.append([measurement.get_name()+"_w"+"{0:.1f}".format((i+1)/num_widths), "{0:.2f}".format(measurement.measurement_value[i]*m), "Meters"])
+                        pixel_measurement.append([measurement.get_name()+"_w"+"{0:.1f}".format((i+1)/(num_widths+1)*100),"{0:.2f}".format(measurement.measurement_value[i]), "Pixels"])
+                        unit_measurement.append([measurement.get_name()+"_w"+"{0:.1f}".format((i+1)/(num_widths+1)*100), "{0:.2f}".format(measurement.measurement_value[i]*m), "Meters"])
                 case consts.LENGTH:
                     pixel_measurement.append([measurement.get_name(),"{0:.2f}".format(measurement.measurement_value), "Pixels"])
                     unit_measurement.append([measurement.get_name(), "{0:.2f}".format(measurement.measurement_value*m), "Meters"])
