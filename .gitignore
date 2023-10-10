@@ -843,3 +843,5 @@ morphometrix/MorphoMetriX.app/Contents/Resources/icon.png
 morphometrix/MorphoMetriX.app/Contents/Resources/logo.icns
 morphometrix/__pycache__/graphicsview.cpython-310.pyc
 morphometrix/__pycache__/graphicsview.cpython-310.pyc
+morphometrix/__pycache__/graphicsview.cpython-310.pyc
+*.pyc

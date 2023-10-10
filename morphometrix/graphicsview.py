@@ -388,7 +388,7 @@ class imwin(QGraphicsView):
                     unit_measurement.append([measurement.get_name(), "{0:.2f}".format(measurement.measurement_value), "Degrees"])
                 case consts.AREA:
                     pixel_measurement.append([measurement.get_name(), "{0:.2f}".format(measurement.measurement_value), "Pixels"])
-                    unit_measurement.append([measurement.get_name(), "{0:.2f}".format(measurement.measurement_value*m), "Square Meters"])
+                    unit_measurement.append([measurement.get_name(), "{0:.2f}".format(measurement.measurement_value*(m**2)), "Square Meters"])
         return pixel_measurement, unit_measurement
 
     # Measure widths of aquatic animal (Called when GUI button is pressed)

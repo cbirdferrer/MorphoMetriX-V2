@@ -329,7 +329,7 @@ class MainWindow(QMainWindow):
         pixeldim = float(self.subWin.pixeldim.text())
         altitude = float(self.subWin.altitude.text())
         focal = float(self.subWin.focal.text())
-        # Convert in mm https://www.imaging-resource.com/PRODS/sony-a5100/sony-a5100DAT.HTM
+
         if name:
             meta_data = [["Object","Value","Value_unit"],
                         ['Image ID',self.subWin.id.text(),"Metadata"],
@@ -347,7 +347,7 @@ class MainWindow(QMainWindow):
                 writer.writerows(meta_data)     # Writes flight data and metadata
 
                 self.iw.calculate_widths(self.subWin.side_bias.currentText())      # Calculate widths of MovingEllipses at export
-                m = pixeldim * altitude / focal
+                m = pixeldim * (altitude / focal)
                 pixel_measurements, unit_measurements = self.iw.get_measurement_names_and_values(m)
                 
                 writer.writerows(unit_measurements)
