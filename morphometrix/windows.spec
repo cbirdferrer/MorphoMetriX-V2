@@ -8,7 +8,7 @@ a = Analysis(
     ['__main__.py'],
     pathex=[],
     binaries=[],
-    datas=[('crosshair.png', '.'),('icon.png', '.')],
+    datas=[('crosshair.png', '.'),('icon.png', '.'),('dot.png', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

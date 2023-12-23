@@ -43,10 +43,12 @@ class imwin(QGraphicsView):
 
         self.picked_color = QtGui.QColor("red")     # Default width ellipse color
         self.slider_pos = 10                        # Used by Ellipse Class
+        self.opacity_pos = 10                       # Used by Ellipse Class
         self.numwidths = None                       # User defined for width measurements
         self.measurement_stack = []                 # Initialize Empty Stack (FIFO)
         self.measuring_state = None                 # Current measuring state
         self.pixmap = None                          # Background image
+        self.crosshair_shape = "Crosshair"
         
         self.setMouseTracking(True)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -105,7 +107,7 @@ class imwin(QGraphicsView):
                     case consts.LINEITEM:
                         self.scene.addItem(QGraphicsLineItem(item["parms"]))
                     case consts.ELLIPSEITEM:
-                        item["parms"].update_scale(self.slider_pos)
+                        item["parms"].update_crosshair(self.slider_pos, self.opacity_pos)
                         self.scene.addItem(item["parms"])
                     case consts.PATHITEM:
                         self.scene.addPath(item["parms"])
@@ -157,8 +159,9 @@ class imwin(QGraphicsView):
 
     # Changes size of ellipses drawn on screen
     # Called from MainWindow
-    def slider_moved(self, value):
-        self.slider_pos = value
+    def slider_moved(self, width_value, opactity_value):
+        self.slider_pos = width_value
+        self.opacity_pos = opactity_value
         self.draw_scene()
                 
     # Activated every key press
@@ -456,7 +459,7 @@ class imwin(QGraphicsView):
                                 "type": consts.FONTITEM
                             })
                     width_measurement.append_object({   # Append Ellipse
-                                "parms": MovingEllipse(self, start, end, self.slider_pos, l%2),
+                                "parms": MovingEllipse(self, start, end, self.slider_pos, l%2, self.parent().subWin.width_tabs.currentText()),
                                 "type": consts.ELLIPSEITEM
                             })
                     width_measurement.append_object({   # Append Line
@@ -524,13 +527,20 @@ def resource_path(relative_path):
 # Ellipse is bound to parent line
 # Input: Point P1 (QPointF), Point P2 (QPointF)
 class MovingEllipse(QGraphicsPixmapItem):
-    def __init__(self, parent,lp1, lp2, scale, side):
+    def __init__(self, parent,lp1, lp2, scale, side, shape_type):
         # LP2 is always border point (PyQt6.QtCore.QPointF(1030.9353133069922, 0.0))
         super(MovingEllipse,self).__init__()
 
-        scaledSize = int(parent.scene.height()/80) + (scale*10)
-        Image = QPixmap(resource_path("crosshair.png")).scaled(scaledSize,scaledSize)
+        scaledSize = 10 + (scale*10)
+        self.shape_key = shape_type
+        match self.shape_key:
+            case "Crosshair":   # Save user selected shape type
+                Image = QPixmap(resource_path("crosshair.png")).scaled(scaledSize,scaledSize)
+            case "Dot":
+                Image = QPixmap(resource_path("dot.png")).scaled(scaledSize,scaledSize)
+        
         self.color = parent.picked_color
+        self.setOpacity(parent.opacity_pos)
         self.Pixmap = QPixmap(Image.size())
         self.Pixmap.fill(self.color)
         self.Pixmap.setMask(Image.createMaskFromColor(Qt.GlobalColor.transparent))
@@ -559,15 +569,21 @@ class MovingEllipse(QGraphicsPixmapItem):
         self.setAcceptHoverEvents(True)
         self.drag = False
 
-    def update_scale(self, scale):
-        scaledSize = int(self.parent.scene.height()/60) + (scale*10)
-        Image = QPixmap(resource_path("crosshair.png")).scaled(scaledSize,scaledSize)
+    def update_crosshair(self, scale, opacity):
+        # scaledSize = int(self.parent.scene.height()/60) + (scale*10) # OLD WAY, just set to 50 pixel minimum for those hardcore low res users
+        scaledSize = 10 + (scale*10)
+        match self.shape_key:
+            case "Crosshair":   # Save user selected shape type
+                Image = QPixmap(resource_path("crosshair.png")).scaled(scaledSize,scaledSize)
+            case "Dot":
+                Image = QPixmap(resource_path("dot.png")).scaled(scaledSize,scaledSize)
         self.Pixmap = QPixmap(Image.size())
         self.Pixmap.fill(self.color)
         self.Pixmap.setMask(Image.createMaskFromColor(Qt.GlobalColor.transparent))
 
         self.setPixmap(self.Pixmap)
         self.setOffset(QtCore.QPointF(-scaledSize/2,-scaledSize/2)) # Set offset to center of image
+        self.setOpacity(opacity/10)
 
     def assignPoints(self, slope, lp1, lp2):
         # Set Points depending on their path slope 

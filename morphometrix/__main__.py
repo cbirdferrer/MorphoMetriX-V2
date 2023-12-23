@@ -6,9 +6,12 @@ import webbrowser
 from graphicsview import imwin, resource_path
 
 from PySide6 import QtGui, QtCore
-from PySide6.QtWidgets import QSlider ,QColorDialog ,QComboBox, QMainWindow, QApplication,  QWidget, QToolBar, QPushButton, QLabel, QLineEdit, QPlainTextEdit, QGridLayout, QFileDialog, QMessageBox, QInputDialog, QDockWidget, QSizePolicy, QRadioButton
-from PySide6.QtGui import QShortcut, QIcon
+from PySide6.QtWidgets import QTabWidget, QSlider ,QColorDialog ,QComboBox, QMainWindow, QApplication,  QWidget, QToolBar, QPushButton, QLabel, QLineEdit, QPlainTextEdit, QGridLayout, QFileDialog, QMessageBox, QInputDialog, QDockWidget, QSizePolicy, QRadioButton
+from PySide6.QtGui import QShortcut, QIcon, QIntValidator, QDoubleValidator
 from PySide6.QtCore import Qt
+
+# TODO: Update before every release
+VERSION = "2.2.0"
 
 # ------------------------------
 #   MorphoMetrix - Developed By:
@@ -19,7 +22,7 @@ from PySide6.QtCore import Qt
 # ------------------------------
 #   Packages (Used Universal2 Python install with universal2 Wheels for MacOS):
 #   Python 3.10.8
-#   PySide6 6.5.1
+#   PySide6 6.4.3
 #   Numpy 1.21.6
 #   Scipy 1.9.1
 # ------------------------------
@@ -43,23 +46,28 @@ class Window(QWidget):
 
         self.label_id = QLabel("Image ID")
         self.id = QLineEdit()
+        self.id.setValidator(QIntValidator())
         self.id.setText('0000')
 
         #Define custom attributes for pixel -> SI conversion
         self.label_foc = QLabel("Focal Length (mm):")
         self.focal = QLineEdit()
+        self.focal.setValidator(QDoubleValidator())
         self.focal.setText('25')
 
         self.label_alt = QLabel("Altitude (m):")
         self.altitude = QLineEdit()
+        self.altitude.setValidator(QDoubleValidator())
         self.altitude.setText('50')
-
+        
         self.label_pd = QLabel("Pixel Dimension (mm/pixel)")
         self.pixeldim = QLineEdit()
+        self.pixeldim.setValidator(QDoubleValidator())
         self.pixeldim.setText('0.0045')
 
         self.label_widths = QLabel("# Width Segments:")
         self.numwidths = QLineEdit()
+        self.numwidths.setValidator(QIntValidator())
         self.numwidths.setText('10')
 
         self.label_side = QLabel("Mirror Side:")
@@ -71,6 +79,16 @@ class Window(QWidget):
         self.scale_slider.setMaximum(20)
         self.scale_slider.setValue(10)
         self.scale_slider.valueChanged.connect(self.slider_changed)
+
+        self.label_opacity = QLabel("Crosshair Opacity")
+        self.opacity_slider = QSlider(orientation=Qt.Orientation.Horizontal)
+        self.opacity_slider.setMaximum(10)
+        self.opacity_slider.setValue(10)
+        self.opacity_slider.valueChanged.connect(self.slider_changed)
+
+        self.label_widthtype =  QLabel("Crosshair Type:")
+        self.width_tabs = QComboBox()
+        self.width_tabs.addItems(["Crosshair", "Dot"])
 
         self.label_not = QLabel("Notes:")
         self.notes = QPlainTextEdit()
@@ -101,12 +119,16 @@ class Window(QWidget):
         self.grid.addWidget(self.side_bias,6,1)
         self.grid.addWidget(self.label_scale,7,0)
         self.grid.addWidget(self.scale_slider,7,1)
-        self.grid.addWidget(self.label_not, 8, 0)
-        self.grid.addWidget(self.notes, 8, 1)
-        self.grid.addWidget(self.label_color,9,0)
-        self.grid.addWidget(self.button_color,9,1)
-        self.grid.addWidget(self.manual, 10, 3)
-        self.grid.addWidget(self.exit, 11, 3)
+        self.grid.addWidget(self.label_opacity,8,0)
+        self.grid.addWidget(self.opacity_slider,8,1)
+        self.grid.addWidget(self.label_widthtype,9,0)
+        self.grid.addWidget(self.width_tabs,9,1)
+        self.grid.addWidget(self.label_not, 10, 0)
+        self.grid.addWidget(self.notes, 10, 1)
+        self.grid.addWidget(self.label_color,11,0)
+        self.grid.addWidget(self.button_color,11,1)
+        self.grid.addWidget(self.manual, 12, 1)
+        self.grid.addWidget(self.exit, 13, 1)
         self.setLayout(self.grid)
 
     # Function used by color picker button
@@ -120,14 +142,17 @@ class Window(QWidget):
     # Passed new size to imwin function "slider_moved"
     def slider_changed(self):
         self.scale_slider.value() # Value grab lags behind actually value?
-        self.iw.slider_moved(self.scale_slider.value())
+        self.opacity_slider.value()
+        self.iw.slider_moved(self.scale_slider.value(),self.opacity_slider.value())
+
 
     # Called when user clicks "Exit" button 
     def close_application(self):
         choice = QMessageBox.question(self, 'exit', "Exit program?", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         if choice == QMessageBox.StandardButton.Yes:
-            self.parent().deleteLater()
-            self.parent().close()
+            # self.parent().deleteLater()
+            # self.parent().close()
+            exit()
 
 #references:
 #https://stackoverflow.com/questions/26901540/arc-in-qgraphicsscene/26903599#26903599
@@ -381,6 +406,7 @@ def except_hook(exc_type, exc_value, exc_tb):
                 file.write("Python Implementation: " + platform.python_implementation() + '\n')
                 file.write("Release: " + platform.release() + '\n')
                 file.write("Version: " + platform.version() + '\n')
+                file.write("MorphoMetrix Version: " + VERSION + '\n')
                 file.write("Machine: " + platform.machine() + '\n')
                 file.write("Processor: " + platform.processor() + '\n' + '\n')
                 file.write(tb)
