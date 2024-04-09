@@ -20,9 +20,9 @@
     <a href="https://github.com/ZappyMan/MorphoMetriX/issues">Request Feature</a>
   </p>
 </p>
-<p align="center">
+<align="center">
 ![Downloads](https://img.shields.io/github/downloads/ZappyMan/MorphoMetriX/total) ![Contributors](https://img.shields.io/github/contributors/ZappyMan/MorphoMetriX?color=dark-green) ![Stargazers](https://img.shields.io/github/stars/ZappyMan/MorphoMetriX?style=social) ![Issues](https://img.shields.io/github/issues/ZappyMan/MorphoMetriX) ![License](https://img.shields.io/github/license/ZappyMan/MorphoMetriX) 
-</p>
+</>
 ## Table Of Contents
 
 * [About the Project](#about-the-project)
