@@ -152,7 +152,7 @@ class Window(QWidget):
         if choice == QMessageBox.StandardButton.Yes:
             # self.parent().deleteLater()
             # self.parent().close()
-            exit()
+            sys.exit()
 
 #references:
 #https://stackoverflow.com/questions/26901540/arc-in-qgraphicsscene/26903599#26903599
@@ -175,7 +175,7 @@ class MainWindow(QMainWindow):
         self.iw = imwin()           # Image window
         self.subWin = Window(self.iw)
         self.setCentralWidget(self.iw)
-
+        
         #Stacked dock widgets
         docked1 = QDockWidget("", self)
         self.addDockWidget(QtCore.Qt.DockWidgetArea.LeftDockWidgetArea, docked1)

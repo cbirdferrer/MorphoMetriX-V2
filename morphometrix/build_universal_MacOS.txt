@@ -1,0 +1,7 @@
+
+1. Install universal2 python from Python.org (cannot create conda enviroment, not supported)
+        /usr/local/bin/python3
+2. Install universal packages
+        /usr/local/bin/pip3
+3. Run PyInstaller and create universal distribution
+        /Library/Frameworks/Python.framework/Versions/3.10/bin/pyinstaller universal_mac.spec
