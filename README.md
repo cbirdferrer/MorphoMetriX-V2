@@ -4,7 +4,7 @@
     <img src="https://raw.githubusercontent.com/ZappyMan/MorphoMetriX-V2/master/morphometrix/icon.png" alt="Logo" width="80" height="80">
   </a>
 
-  <h3 align="center">MorphoMetriX 2.0</h3>
+  <h1 align="center">MorphoMetriX 2.0</h1>
 
   <p align="center">
     A GUI for photogrammetry and morphometry
