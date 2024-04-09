@@ -21,7 +21,13 @@
   </p>
 </p>
 <div align="center">
-![Downloads](https://img.shields.io/github/downloads/ZappyMan/MorphoMetriX/total) ![Contributors](https://img.shields.io/github/contributors/ZappyMan/MorphoMetriX?color=dark-green) ![Stargazers](https://img.shields.io/github/stars/ZappyMan/MorphoMetriX?style=social) ![Issues](https://img.shields.io/github/issues/ZappyMan/MorphoMetriX) ![License](https://img.shields.io/github/license/ZappyMan/MorphoMetriX) 
+
+![Downloads](https://img.shields.io/github/downloads/ZappyMan/MorphoMetriX/total) 
+![Contributors](https://img.shields.io/github/contributors/ZappyMan/MorphoMetriX?color=dark-green) 
+![Stargazers](https://img.shields.io/github/stars/ZappyMan/MorphoMetriX?style=social) 
+![Issues](https://img.shields.io/github/issues/ZappyMan/MorphoMetriX) 
+![License](https://img.shields.io/github/license/ZappyMan/MorphoMetriX) 
+
 </div>
 ## Table Of Contents
 
