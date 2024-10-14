@@ -7,7 +7,7 @@
   <h1 align="center">MorphoMetriX 2.0</h1>
 
   <p align="center">
-    An intuitive Morphometric tool
+    User-Friendly Photogrammetry Software
     <br/>
     <br/>
     <a href="https://github.com/ZappyMan/MorphoMetriX/blob/master/MorphoMetriX_v2_manual.pdf"><strong>Read the Manual »</strong></a>
