@@ -28,3 +28,4 @@ morphometrix/dist
 __pycache__
 morphometrix/__pycache__
 *.pyc
+*.rdb

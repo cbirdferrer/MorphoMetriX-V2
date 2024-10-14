@@ -6,7 +6,7 @@ import webbrowser
 from graphicsview import imwin, resource_path
 
 from PySide6 import QtGui, QtCore
-from PySide6.QtWidgets import QTabWidget, QSlider ,QColorDialog ,QComboBox, QMainWindow, QApplication,  QWidget, QToolBar, QPushButton, QLabel, QLineEdit, QPlainTextEdit, QGridLayout, QFileDialog, QMessageBox, QInputDialog, QDockWidget, QSizePolicy, QRadioButton
+from PySide6.QtWidgets import QSlider ,QColorDialog ,QComboBox, QMainWindow, QApplication,  QWidget, QToolBar, QPushButton, QLabel, QLineEdit, QPlainTextEdit, QGridLayout, QFileDialog, QMessageBox, QInputDialog, QDockWidget, QSizePolicy, QRadioButton
 from PySide6.QtGui import QShortcut, QIcon, QIntValidator, QDoubleValidator
 from PySide6.QtCore import Qt
 
@@ -46,7 +46,7 @@ class Window(QWidget):
 
         self.label_id = QLabel("Image ID")
         self.id = QLineEdit()
-        self.id.setValidator(QIntValidator())
+        # self.id.setValidator(QIntValidator())
         self.id.setText('0000')
 
         #Define custom attributes for pixel -> SI conversion
@@ -254,7 +254,7 @@ class MainWindow(QMainWindow):
     # New Project
     # Set all defaults and clear stored values
     def file_open(self):
-        self.image_name = QFileDialog.getOpenFileName(self, 'Open File')
+        self.image_name = QFileDialog.getOpenFileName(self, 'Open File', filter="Images (*.png *.jpg *.PNG *.JPG)")
 
         if self.image_name[0]: # If user selected a file, create new project
             self.iw.new_project(self.image_name[0])
@@ -349,11 +349,17 @@ class MainWindow(QMainWindow):
     # Collect measurements from graphicsview
     def export_measurements(self):
         # Popup to get user save file input
+        
+        try:
+            pixeldim = float(self.subWin.pixeldim.text())
+            altitude = float(self.subWin.altitude.text())
+            focal = float(self.subWin.focal.text())
+        except:
+            QMessageBox.warning(self,"Warning","Focal Length, Altitude, or Pixel Dimension cannot be empty.",QMessageBox.StandardButton.Ok)
+            return
+
         name = QFileDialog.getSaveFileName(
             self, 'Save File', self.image_name[0].split('.', 1)[0])[0]
-        pixeldim = float(self.subWin.pixeldim.text())
-        altitude = float(self.subWin.altitude.text())
-        focal = float(self.subWin.focal.text())
 
         if name:
             meta_data = [["Object","Value","Value_unit"],
@@ -383,6 +389,7 @@ class MainWindow(QMainWindow):
             pix = QtGui.QPixmap(self.iw.viewport().size())
             self.iw.viewport().render(pix)
             pix.save(name + '-measurements.png')
+            self.statusbar.showMessage('Export Complete!')
 
 # Crash handler for error logging
 def except_hook(exc_type, exc_value, exc_tb):
