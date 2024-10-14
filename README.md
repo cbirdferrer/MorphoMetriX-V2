@@ -24,11 +24,11 @@
 
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.01825/status.svg)](https://doi.org/10.21105/joss.01825)
 [![DOI](https://zenodo.org/badge/202208604.svg)](https://zenodo.org/badge/latestdoi/202208604)
-![Downloads](https://img.shields.io/github/downloads/MMI-CODEX/MorphoMetriX/total) 
-![Contributors](https://img.shields.io/github/contributors/MMI-CODEX/MorphoMetriX?color=dark-green) 
-![Stargazers](https://img.shields.io/github/stars/MMI-CODEX/MorphoMetriX?style=social) 
-![Issues](https://img.shields.io/github/issues/MMI-CODEX/MorphoMetriX) 
-![License](https://img.shields.io/github/license/MMI-CODEX/MorphoMetriX) 
+![Downloads](https://img.shields.io/github/downloads/MMI-CODEX/MorphoMetriX-V2/total) 
+![Contributors](https://img.shields.io/github/contributors/MMI-CODEX/MorphoMetriX-V2?color=dark-green) 
+![Stargazers](https://img.shields.io/github/stars/MMI-CODEX/MorphoMetriX-V2?style=social) 
+![Issues](https://img.shields.io/github/issues/MMI-CODEX/MorphoMetriX-V2) 
+![License](https://img.shields.io/github/license/MMI-CODEX/MorphoMetriX-V2) 
 
 </div>
 
