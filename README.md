@@ -10,14 +10,14 @@
     User-Friendly Photogrammetry Software
     <br/>
     <br/>
-    <a href="https://github.com/MMI-CODEX/MorphoMetriX/blob/master/MorphoMetriX_v2_manual.pdf"><strong>Read the Manual »</strong></a>
+    <a href="https://github.com/MMI-CODEX/MorphoMetriX-V2/blob/master/MorphoMetriX_v2_manual.pdf"><strong>Read the Manual »</strong></a>
     <br/>
     <br/>
     <a href="https://github.com/MMI-CODEX/MorphoMetriX-V2/tree/master/demo">See Demo Annotations</a>
     .
-    <a href="https://github.com/MMI-CODEX/MorphoMetriX/issues">Report Bug</a>
+    <a href="https://github.com/MMI-CODEX/MorphoMetriX-V2/issues">Report Bug</a>
     .
-    <a href="https://github.com/MMI-CODEX/MorphoMetriX/issues">Request Feature</a>
+    <a href="https://github.com/MMI-CODEX/MorphoMetriX-V2/issues">Request Feature</a>
   </p>
 </p>
 <div align="center">
@@ -57,7 +57,7 @@ Also check out [CollatriX](https://github.com/cbirdferrer/collatrix)<sup>1</sup>
 
 ## Getting Started
 
-To install MorphoMetrix go to our [releases page](https://github.com/MMI-CODEX/morphometrix/releases) and download either the dmg (for macs) or exe (for windows). For further detail, please see our [manual pdf](https://github.com/MMI-CODEX/MorphoMetriX/blob/master/MorphoMetriX_v2_manual.pdf). Continue reading if you prefer to run the source code locally.
+To install MorphoMetrix go to our [releases page](https://github.com/MMI-CODEX/MorphoMetriX-V2/releases) and download either the dmg (for macs) or exe (for windows). For further detail, please see our [manual pdf](https://github.com/MMI-CODEX/MorphoMetriX-V2/blob/master/MorphoMetriX_v2_manual.pdf). Continue reading if you prefer to run the source code locally.
 
 ### Prerequisites
 
@@ -89,15 +89,15 @@ python3 morphometrix/__main__.py
 
 ## Usage
 
-For further detail, please see our [manual pdf](https://github.com/MMI-CODEX/MorphoMetriX/blob/master/MorphoMetriX_v2_manual.pdf)
+For further detail, please see our [manual pdf](https://github.com/MMI-CODEX/MorphoMetriX-V2/blob/master/MorphoMetriX_v2_manual.pdf)
 
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-* If you have suggestions for adding or removing projects, feel free to [open an issue](https://github.com/MMI-CODEX/MorphoMetriX/issues/new) to discuss it, or directly create a pull request after you edit the *README.md* file with necessary changes.
+* If you have suggestions for adding or removing projects, feel free to [open an issue](https://github.com/MMI-CODEX/MorphoMetriX-V2/issues/new) to discuss it, or directly create a pull request after you edit the *README.md* file with necessary changes.
 * Please make sure you check your spelling and grammar.
 * Create individual PR for each suggestion.
-* Please also read through the [Code Of Conduct](https://github.com/MMI-CODEX/MorphoMetriX/blob/main/CODE_OF_CONDUCT.md) before posting your first idea as well.
+* Please also read through the [Code Of Conduct](https://github.com/MMI-CODEX/MorphoMetriX-V2/blob/main/CODE_OF_CONDUCT.md) before posting your first idea as well.
 
 ### Creating A Pull Request
 
@@ -109,11 +109,11 @@ Contributions are what make the open source community such an amazing place to b
 
 ## License
 
-Distributed under the MIT License. See [LICENSE](https://github.com/MMI-CODEX/MorphoMetriX/blob/main/LICENSE.md) for more information.
+Distributed under the MIT License. See [LICENSE](https://github.com/MMI-CODEX/MorphoMetriX-V2/blob/main/LICENSE.md) for more information.
 
 ## Authors
 
-* **Elliott Chimienti** - *OSU Computer Science Graduate Student* - [Elliott Chimienti](https://github.com/MMI-CODEX/) - *Maintainer*
+* **Elliott Chimienti** - *OSU Computer Science Graduate Student* - [Elliott Chimienti](https://github.com/ZappyMan) - *Maintainer*
 * **KC Bierlich** - *Postdoctoral Scholar, PhD Marine Science and Conservation* - [KC Bierlich](https://mmi.oregonstate.edu/people/kevin-bierlich)
 * **Clara Bird** - *PhD Candidate, Department of Fisheries, Wildlife & Conservation Sciences* - [Clara Bird](https://mmi.oregonstate.edu/people/clara-bird)
 * **Walter Torres** - *Postdoctoral Researcher, PhD, Marine Science & Conservation*
